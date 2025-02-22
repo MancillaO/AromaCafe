@@ -14,7 +14,7 @@ public class MySQLConnection {
 
     public static Connection getConnection() throws SQLException {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            //Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
         } catch (ClassNotFoundException e) {
             throw new SQLException("No se pudo cargar el driver JDBC", e);
