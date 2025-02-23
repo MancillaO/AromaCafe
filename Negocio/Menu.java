@@ -10,10 +10,15 @@ public class Menu {
     public void iniciar(){
          int opcion = 0;
         while (opcion != 3) {
-            System.out.println("Seleccione la base de datos a la que desea conectarse:");
-            System.out.println("1. PostgreSQL");
-            System.out.println("2. MySQL");
-            System.out.println("3. Salir");
+            System.out.println("|=========================================================|");
+            System.out.println("|                 Bienvenido a Aroma y Café               |");
+            System.out.println("|                 \"Un cafe, mil momentos\"               |");
+            System.out.println("|=========================================================|");
+            System.out.println("|Seleccione la base de datos a la que desea conectarse:   |");
+            System.out.println("|1. PostgreSQL                                            |");
+            System.out.println("|2. MySQL                                                 |");
+            System.out.println("|3. Salir                                                 |");
+            System.out.println("|=========================================================|");
             System.out.print("Opción: ");
             opcion = scanner.nextInt();
 
@@ -48,7 +53,7 @@ public class Menu {
 
     private void conectarMySQL() {
         MySQLConnection mysql = new MySQLConnection();
-        
+
         try (Connection conn = mysql.getConnection()) {
             if (conn != null) {
                 System.out.println("Conexión exitosa a MySQL.");
