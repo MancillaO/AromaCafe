@@ -8,9 +8,9 @@ import java.sql.SQLException;
 
 public class PostgreSQLConnection {
 
-    private static final String POSTGRESQL_URL = "jdbc:postgresql://localhost:5432/aroma_y_cafe";
-    private static final String POSTGRESQL_USER = "postgres";
-    private static final String POSTGRESQL_PASSWORD = "2801";
+    private static final String POSTGRESQL_URL = EnvLoader.get("POSTGRESQL_URL");
+    private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
+    private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
 
     public Connection getConnection() throws SQLException {
         try {
