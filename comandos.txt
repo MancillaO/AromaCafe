@@ -1,0 +1,5 @@
+-- Compilar:
+javac Presentacion/Cafeteria.java Negocio/Menu.java Datos/MySQLConnection.java Datos/PostgreSQLConnection.java
+
+-- Ejecutar:
+java -cp .;Drivers/postgresql-42.2.29.jre7.jar;Drivers/mysql-connector-j-8.0.33.jar Presentacion.Cafeteria

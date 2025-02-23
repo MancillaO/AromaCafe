@@ -10,13 +10,13 @@ public class MySQLConnection {
 
     private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/aroma_y_cafe";
     private static final String MYSQL_USER = "root";
-    private static final String MYSQL_PASSWORD = "1417a";
+    private static final String MYSQL_PASSWORD = "";
 
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         try {
             //Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException e) {
             throw new SQLException("No se pudo cargar el driver JDBC", e);
         }
     }
