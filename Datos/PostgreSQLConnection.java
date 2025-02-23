@@ -34,8 +34,8 @@ public class PostgreSQLConnection {
         }
     }
 
-    public void listCategorias() {
-        String query = "SELECT * FROM categorias";
+    public void listCategorias(int opcion) {
+        String query = "SELECT * FROM categorias WHERE id=?" + opcion;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
@@ -96,8 +96,8 @@ public class PostgreSQLConnection {
         }
     }
 
-    public void listProductos() {
-        String query = "SELECT * FROM productos";
+    public void listProductos(int opcion) {
+        String query = "SELECT * FROM productos WHERE id=?" + opcion ;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {

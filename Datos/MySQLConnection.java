@@ -16,7 +16,7 @@ public class MySQLConnection {
         try {
             //Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             throw new SQLException("No se pudo cargar el driver JDBC", e);
         }
     }
