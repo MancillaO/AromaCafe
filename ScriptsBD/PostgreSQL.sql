@@ -1,4 +1,3 @@
--- Crear la base de datos
 CREATE DATABASE aroma_y_cafe;
 
 -- Conectar a la base de datos

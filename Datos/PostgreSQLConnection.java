@@ -10,14 +10,13 @@ public class PostgreSQLConnection {
 
     private static final String POSTGRESQL_URL = "jdbc:postgresql://localhost:5432/aroma_y_cafe";
     private static final String POSTGRESQL_USER = "postgres";
-    private static final String POSTGRESQL_PASSWORD = "password";
+    private static final String POSTGRESQL_PASSWORD = "2801";
 
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         try {
-            //Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("No se pudo cargar el driver JDBC", e);
+        } catch (SQLException e) {
+            throw new SQLException("No se pudo conectar a la base de datos", e);
         }
     }
 

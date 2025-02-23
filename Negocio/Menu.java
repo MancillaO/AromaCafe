@@ -1,18 +1,19 @@
 package Negocio;
 
-import Datos.ConexionBD;
+import Datos.PostgreSQLConnection;
+import Datos.MySQLConnection;
 import java.sql.Connection;
 import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner = new Scanner(System.in);
 
-    public void iniciar(){
-         int opcion = 0;
+    public void iniciar() {
+        int opcion = 0;
         while (opcion != 3) {
             System.out.println("|=========================================================|");
             System.out.println("|                 Bienvenido a Aroma y Café               |");
-            System.out.println("|                 \"Un cafe, mil momentos\"               |");
+            System.out.println("|                  \"Un cafe, mil momentos\"                |");
             System.out.println("|=========================================================|");
             System.out.println("|Seleccione la base de datos a la que desea conectarse:   |");
             System.out.println("|1. PostgreSQL                                            |");
@@ -44,7 +45,7 @@ public class Menu {
         try (Connection conn = postgres.getConnection()) {
             if (conn != null) {
                 System.out.println("Conexión exitosa a PostgreSQL.");
-                
+
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a PostgreSQL: " + e.getMessage());
@@ -57,7 +58,6 @@ public class Menu {
         try (Connection conn = mysql.getConnection()) {
             if (conn != null) {
                 System.out.println("Conexión exitosa a MySQL.");
-                
 
             }
         } catch (Exception e) {
