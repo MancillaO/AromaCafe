@@ -8,13 +8,12 @@ import java.sql.SQLException;
 
 public class MySQLConnection {
 
-    private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/aroma_y_cafe";
-    private static final String MYSQL_USER = "root";
-    private static final String MYSQL_PASSWORD = "";
+    private static final String MYSQL_URL = EnvLoader.get("MYSQL_URL");
+    private static final String MYSQL_USER = EnvLoader.get("MYSQL_USER");
+    private static final String MYSQL_PASSWORD = EnvLoader.get("MYSQL_PASSWORD");
 
     public Connection getConnection() throws SQLException {
         try {
-            //Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
         } catch (SQLException e) {
             throw new SQLException("No se pudo cargar el driver JDBC", e);
