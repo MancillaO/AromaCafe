@@ -101,12 +101,15 @@ public class PostgreSQLConnection {
          PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, categoriaId);
             ResultSet rs = stmt.executeQuery();
-            System.out.println("\nProductos disponibles:");
+            System.out.println("=====================================================");
+            System.out.println("Productos disponibles:");
+            System.out.println("=====================================================");
             while (rs.next()) {
                 System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre") +
                                 ", Precio: $" + rs.getDouble("precio") +
                                 ", Descripción: " + rs.getString("descripcion"));
         }
+        System.out.println("========================================================");
     } catch (SQLException e) {
         e.printStackTrace();
     }
