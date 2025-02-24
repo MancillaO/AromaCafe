@@ -47,7 +47,7 @@ public class Menu {
                 System.out.println("Conexión exitosa a PostgreSQL.");
                 System.out.println("|=========================================================|");
                 System.out.println("|                          Menu                           |");
-                System.out.println("|                      Aroma y Café                       |");
+                System.out.println("|                      Aroma y Cafe                       |");
                 System.out.println("|                 \"Un cafe, mil momentos\"               |");
                 System.out.println("|=========================================================|");
                 System.out.println("|¿Alguna preferencia de tu eleccion en este momento?      |");
@@ -56,12 +56,21 @@ public class Menu {
                 System.out.println("|3. Platillos Salados                                     |");
                 System.out.println("|4. Platillos Dulces                                      |");
                 System.out.println("|5. Platillos Veganos                                     |");
+                System.out.println("|6. Platillos Veganos                                     |");
                 System.out.println("|=========================================================|");
-                System.out.print("Selecciona: ");
-                int opcion = 0;
-                opcion = scanner.nextInt();
-                postgres.listCategorias(opcion);
-                
+                System.out.print("Selecciona una opcion: ");
+
+                int opcion = scanner.nextInt();
+
+                if (opcion == 6) {
+                    System.out.println("Gracias por visitarnos. ¡Hasta pronto!");
+                }
+                if (opcion >= 1 && opcion <= 5) {
+                    postgres.listProductos(opcion);
+
+                } else {
+                    System.out.println("Opción inválida, intenta de nuevo.");
+                }
 
             }
         } catch (Exception e) {

@@ -95,18 +95,21 @@ public class PostgreSQLConnection {
         }
     }
 
-    public void listProductos(int opcion) {
-        String query = "SELECT * FROM productos WHERE id=?" + opcion ;
+    public void listProductos(int categoriaId) {
+        String query = "SELECT * FROM productos WHERE categoria_id = ?";
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
+         PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, categoriaId);
+            ResultSet rs = stmt.executeQuery();
+            System.out.println("\nProductos disponibles:");
             while (rs.next()) {
                 System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre") +
-                        ", Precio: " + rs.getDouble("precio") + ", Descripción: " + rs.getString("descripcion"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+                                ", Precio: $" + rs.getDouble("precio") +
+                                ", Descripción: " + rs.getString("descripcion"));
         }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
     }
 
     public void deleteProducto(int id) {
