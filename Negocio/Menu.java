@@ -13,21 +13,30 @@ public class Menu {
     public void iniciar() {
         int opcion = 0;
         while (opcion != 3) {
-            System.out.println("|===========================================================|");
-            System.out.println("|                 Bienvenido a Aroma y Cafe                 |");
-            System.out.println("|                  \"Un cafe, mil momentos\"                  |");
-            System.out.println("|===========================================================|");
-            System.out.println("|                                                           |");
-            System.out.println("| Seleccione la base de datos a la que desea conectarse:    |");
-            System.out.println("|                                                           |");
-            System.out.println("| 1. PostgreSQL                                             |");
-            System.out.println("| 2. MySQL                                                  |");
-            System.out.println("| 3. Salir                                                  |");
-            System.out.println("|                                                           |");
-            System.out.println("|===========================================================|");
+            System.out.println(cTxt(color("|~|")));
+            System.out.println(cTxt(color("|                 Bienvenido a Aroma y Cafe                 |")));
+            System.out.println(cTxt(color("|                  \"Un cafe, mil momentos\"                |")));
+            System.out.println(cTxt(color("|~|")));
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt("|    ( (  |"));
+            System.out.println(cTxt("|     ) )  |"));
+            System.out.println(cTxt("|  ______  |"));
+            System.out.println(cTxt("| |      |] |"));
+            System.out.println(cTxt("| |      |  |"));
+            System.out.println(cTxt("| \\/  |"));
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt(color("| Seleccione la base de datos a la que desea conectarse:    |")));
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt(color("| 1. PostgreSQL                                             |")));
+            System.out.println(cTxt(color("| 2. MySQL                                                  |")));
+            System.out.println(cTxt(color("| 3. Salir                                                  |")));
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt(color("|~|")));
             System.out.print("Selecciona una opcion: ");
             opcion = scanner.nextInt();
-
+    
             switch (opcion) {
                 case 1:
                     mostraMenu();
@@ -39,10 +48,10 @@ public class Menu {
                     System.out.println("Saliendo...");
                     break;
                 default:
-                    System.out.println("Opcion no válida. Intente de nuevo.");
+                    System.out.println("Opcion no válida. Intente de nuevo.");
             }
         }
-    }
+    }    
 
     private void mostraMenu() {
         PostgreSQLConnection postgres = new PostgreSQLConnection();
@@ -50,17 +59,17 @@ public class Menu {
         try (Connection conn = postgres.getConnection()) {
             if (conn != null) {
                 System.out.println("\nConexion exitosa a PostgreSQL.");
-                System.out.println("|===========================================================|");
-                System.out.println("|                           Menu                            |");
-                System.out.println("|                       Aroma y Cafe                        |");
-                System.out.println("|                 \"Un cafe, mil momentos\"                   |");
-                System.out.println("|===========================================================|");
-                System.out.println("|                                                           |");
-                System.out.println("| ¿Alguna preferencia de tu eleccion en este momento?       |");
-                System.out.println("|                                                           |");
+                System.out.println(cTxt(color("|~|")));
+                System.out.println(cTxt(color("|                           Menu                            |")));
+                System.out.println(cTxt(color("|                       Aroma y Cafe                        |")));
+                System.out.println(cTxt(color("|                 \"Un cafe, mil momentos\"                 |")));
+                System.out.println(cTxt(color("|~|")));
+                System.out.println(cTxt(color("|                                                           |")));
+                System.out.println(cTxt(color("| ¿Alguna preferencia de tu eleccion en este momento?       |")));
+                System.out.println(cTxt(color("|                                                           |")));
                 postgres.listCategorias();
-                System.out.println("|                                                           |");
-                System.out.println("|===========================================================|");
+                System.out.println(cTxt(color("|                                                           |")));
+                System.out.println(cTxt(color("|~|")));
                 System.out.print("Selecciona una opcion: ");
                 int opcionCat = scanner.nextInt();
 
@@ -73,7 +82,7 @@ public class Menu {
                         System.out.print("Selecciona una opcion: ");
                         int opcionProd = scanner.nextInt();
                         postgres.mostrarProductoPorId(opcionProd);
-                        System.out.println("*************************************************************");
+                        System.out.println(color("~"));
                         System.out.println("\n¿Desea agregar? SI/NO");
                         System.out.print("Selecciona: ");
                         String opcionAdd = scanner.next();
@@ -89,7 +98,7 @@ public class Menu {
                     }
 
                 } else {
-                    System.out.println("Opción inválida, intenta de nuevo.");
+                    System.out.println("Opción inválida, intenta de nuevo.");
                 }
 
             }
@@ -103,12 +112,32 @@ public class Menu {
 
         try (Connection conn = mysql.getConnection()) {
             if (conn != null) {
-                System.out.println("Conexión exitosa a MySQL.");
+                System.out.println("Conexión exitosa a MySQL.");
 
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a MySQL: " + e.getMessage());
         }
+    }
+
+    // centrar texto
+    public static String cTxt(String texto) {
+        int anchoPantalla = 80; 
+        int espacio = (anchoPantalla - texto.length()) / 2;
+        StringBuilder sb = new StringBuilder();
+        
+        // Agregar espacios antes del texto para centrarlo
+        for (int i = 0; i < espacio; i++) {
+            sb.append(" ");
+        }
+        
+        sb.append(texto);
+        return sb.toString();
+    }
+
+    // color de ~ a gris
+    public static String color(String texto) {
+        return texto.replace("", "\033[38;5;238m\033[0m");
     }
 
 }

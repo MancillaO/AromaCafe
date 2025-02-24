@@ -25,17 +25,17 @@ public class PostgreSQLConnection {
         String query = "SELECT * FROM categorias";
         final int LINE_WIDTH = 60;
         final int MARGIN = 1;
-
+    
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
-
+    
             while (rs.next()) {
                 StringBuilder line = new StringBuilder();
                 line.append("|");
                 line.append(" ".repeat(MARGIN));
                 String categoryText = rs.getInt("id") + ". " + rs.getString("nombre");
-                line.append(categoryText);
+                line.append(cTxt(color(categoryText))); 
                 int remainingSpace = LINE_WIDTH - categoryText.length() - MARGIN - 1;
                 line.append(" ".repeat(remainingSpace));
                 line.append("|");
@@ -45,6 +45,7 @@ public class PostgreSQLConnection {
             e.printStackTrace();
         }
     }
+    
 
     public void updateCategoria(int id, String nuevoNombre) {
         String query = "UPDATE categorias SET nombre = ? WHERE id = ?";
@@ -54,9 +55,9 @@ public class PostgreSQLConnection {
             stmt.setInt(2, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Categoría actualizada correctamente en PostgreSQL.");
+                System.out.println("Categoría actualizada correctamente en PostgreSQL.");
             } else {
-                System.out.println("No se encontró ninguna categoría con ID " + id + " en PostgreSQL.");
+                System.out.println("No se encontró ninguna categoría con ID " + id + " en PostgreSQL.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,15 +68,15 @@ public class PostgreSQLConnection {
         String query = "SELECT * FROM productos WHERE categoria_id = ?";
         final int LINE_WIDTH = 59;
         final int MARGIN = 1;
-
+    
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, categoriaId);
             ResultSet rs = stmt.executeQuery();
-            System.out.println("\n|===========================================================|");
-            System.out.println("|                   Productos disponibles                   |");
-            System.out.println("|===========================================================|");
-            System.out.println("|                                                           |");
+            System.out.println(cTxt(color("|~|")));
+            System.out.println(cTxt(color("|                   Productos disponibles                   |")));
+            System.out.println(cTxt(color("|~|")));
+            System.out.println(cTxt(color("|                                                           |")));
             while (rs.next()) {
                 StringBuilder line = new StringBuilder();
                 line.append("|");
@@ -84,19 +85,20 @@ public class PostgreSQLConnection {
                 String nombre = rs.getString("nombre");
                 String precio = String.format("$%d", rs.getInt("precio"));
                 String productText = id + ". " + nombre + " ";
-                line.append(productText);
+                line.append(cTxt(color(productText))); 
                 int dashesLength = LINE_WIDTH - productText.length() - precio.length() - MARGIN - 2;
                 line.append("-".repeat(dashesLength));
                 line.append(" " + precio);
                 line.append(" |");
                 System.out.println(line.toString());
             }
-            System.out.println("|                                                           |");
-            System.out.println("|===========================================================|\n");
+            System.out.println(cTxt(color("|                                                           |")));
+            System.out.println(cTxt(color("|~|\n")));
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
 
     public void mostrarProductoPorId(int id) {
         String query = "SELECT * FROM productos WHERE id = ?";
@@ -107,7 +109,7 @@ public class PostgreSQLConnection {
                 if (rs.next()) {
                     System.out.println("\n" + rs.getString("nombre") + ": " + rs.getString("descripcion") + "\n");
                 } else {
-                    System.out.println("No se encontró ningún producto con el ID: " + id);
+                    System.out.println("No se encontró ningún producto con el ID: " + id);
                 }
             }
         } catch (SQLException e) {
@@ -154,7 +156,7 @@ public class PostgreSQLConnection {
             if (rowsAffected > 0) {
                 System.out.println("Pedido eliminado correctamente en PostgreSQL.");
             } else {
-                System.out.println("No se encontró ningún pedido con ID " + id + " en PostgreSQL.");
+                System.out.println("No se encontró ningún pedido con ID " + id + " en PostgreSQL.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -171,7 +173,7 @@ public class PostgreSQLConnection {
             if (rowsAffected > 0) {
                 System.out.println("Pedido actualizado correctamente en PostgreSQL.");
             } else {
-                System.out.println("No se encontró ningún pedido con ID " + id + " en PostgreSQL.");
+                System.out.println("No se encontró ningún pedido con ID " + id + " en PostgreSQL.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -218,7 +220,7 @@ public class PostgreSQLConnection {
             if (rowsAffected > 0) {
                 System.out.println("Detalle de pedido eliminado correctamente en PostgreSQL.");
             } else {
-                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en PostgreSQL.");
+                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en PostgreSQL.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -239,10 +241,32 @@ public class PostgreSQLConnection {
             if (rowsAffected > 0) {
                 System.out.println("Detalle de pedido actualizado correctamente en PostgreSQL.");
             } else {
-                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en PostgreSQL.");
+                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en PostgreSQL.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+
+    // centrar texto 
+    public static String cTxt(String texto) {
+        int LINE_WIDTH = 60; 
+        int espacio = (LINE_WIDTH - texto.length()) / 2;
+        StringBuilder sb = new StringBuilder();
+    
+    // Agregar espacios antes del texto para centrarlo
+    for (int i = 0; i < espacio; i++) {
+        sb.append(" ");
+    }
+    
+    sb.append(texto);
+    return sb.toString();
+    }
+
+    // color de ~ a gris
+    public static String color(String texto) {
+    return texto.replace("", "\033[38;5;238m\033[0m"); 
+    }
+
+
 }
