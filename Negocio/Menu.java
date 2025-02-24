@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner = new Scanner(System.in);
+    private ArrayList<Integer> productosSeleccionados = new ArrayList<>();
 
     public void iniciar() {
         int opcion = 0;
@@ -93,20 +94,16 @@ public class Menu {
     }
 
     private void mostrarProductos(DatabaseConnection dbConnection, int opcionCat) {
-        ArrayList<Integer> productosSeleccionados = new ArrayList<>();
-
         while (true) {
             dbConnection.listProductos(opcionCat);
             System.out.print("Selecciona una opción: ");
             int opcionProd = scanner.nextInt();
             dbConnection.mostrarProductoPorId(opcionProd);
-
             System.out.println("\n¿Desea agregar este producto? SI/NO");
             System.out.print("Selecciona: ");
             String opcionAdd = scanner.next();
-
             if (opcionAdd.equalsIgnoreCase("si")) {
-                productosSeleccionados.add(opcionProd);
+                productosSeleccionados.add(opcionProd); // Usa la variable de instancia
                 System.out.println(productosSeleccionados);
                 while (true) {
                     System.out.println("\n¿Desea agregar otro producto? SI/NO");
@@ -115,7 +112,7 @@ public class Menu {
                     if (opcionAdd2.equalsIgnoreCase("si")) {
                         break;
                     } else if (opcionAdd2.equalsIgnoreCase("no")) {
-                        resumenOrden(dbConnection, productosSeleccionados.stream().mapToInt(i -> i).toArray());
+                        resumenOrden(dbConnection);
                         return;
                     } else {
                         System.out.println("Opción inválida. Intente de nuevo.");
@@ -129,7 +126,7 @@ public class Menu {
         }
     }
 
-    private void resumenOrden(DatabaseConnection dbConnection, int[] productosSeleccionados) {
+    private void resumenOrden(DatabaseConnection dbConnection) {
         System.out.println("\n|===========================================================|");
         System.out.println("|                         MI ORDEN                          |");
         System.out.println("|                       AROMA Y CAFE                        |");
@@ -138,25 +135,25 @@ public class Menu {
         System.out.println("|                                                           |");
         System.out.println("| Tu orden hasta ahora es:                                  |");
         System.out.println("|                                                           |");
-        dbConnection.resumenOrden(productosSeleccionados);
+        dbConnection.resumenOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
         System.out.println("|                                                           |");
         System.out.println("|===========================================================|\n");
         System.out.print("¿Desea agregar algo mas o confirmar su orden (A/C)? ");
         String opcion = scanner.next();
-
         if (opcion.equalsIgnoreCase("a")) {
             mostrarCategorias(dbConnection);
         } else if (opcion.equalsIgnoreCase("c")) {
-            double total = dbConnection.calcularTotalOrden(productosSeleccionados);
+            double total = dbConnection.calcularTotalOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
             dbConnection.insertPedido(total);
-            System.out.println(total);
+
+            for (int idProducto : productosSeleccionados) {
+                // logica para insertar detalle pedido
+                System.out.println("Agregando detalle: " + idProducto);
+            }
+
         } else {
             System.out.println("Opción inválida. Intente de nuevo.");
         }
 
-        for (int idProducto : productosSeleccionados) {
-            // Aqui iria la logica para agregar los productos como detalle de pedido
-            System.out.println("Producto con ID " + idProducto + " insertado en la base de datos.");
-        }
     }
 }
