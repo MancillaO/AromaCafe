@@ -33,13 +33,25 @@ public class PostgreSQLConnection {
         }
     }
 
-    public void listCategorias(int opcion) {
-        String query = "SELECT * FROM categorias WHERE id=?" + opcion;
+    public void listCategorias() {
+        String query = "SELECT * FROM categorias";
+        final int LINE_WIDTH = 60;
+        final int MARGIN = 1;
+
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre"));
+                StringBuilder line = new StringBuilder();
+                line.append("|");
+                line.append(" ".repeat(MARGIN));
+                String categoryText = rs.getInt("id") + ". " + rs.getString("nombre");
+                line.append(categoryText);
+                int remainingSpace = LINE_WIDTH - categoryText.length() - MARGIN - 1;
+                line.append(" ".repeat(remainingSpace));
+                line.append("|");
+                System.out.println(line.toString());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -98,7 +110,7 @@ public class PostgreSQLConnection {
     public void listProductos(int categoriaId) {
         String query = "SELECT * FROM productos WHERE categoria_id = ?";
         try (Connection conn = getConnection();
-         PreparedStatement stmt = conn.prepareStatement(query)) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, categoriaId);
             ResultSet rs = stmt.executeQuery();
             System.out.println("=====================================================");
@@ -106,13 +118,13 @@ public class PostgreSQLConnection {
             System.out.println("=====================================================");
             while (rs.next()) {
                 System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre") +
-                                ", Precio: $" + rs.getDouble("precio") +
-                                ", Descripción: " + rs.getString("descripcion"));
+                        ", Precio: $" + rs.getDouble("precio") +
+                        ", Descripción: " + rs.getString("descripcion"));
+            }
+            System.out.println("========================================================");
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        System.out.println("========================================================");
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
     }
 
     public void deleteProducto(int id) {
