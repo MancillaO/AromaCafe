@@ -31,10 +31,8 @@ public class Menu {
             switch (opcion) {
                 case 1:
                     mostraMenu();
-                    cone = "postgres";
                     break;
                 case 2:
-                    cone = "mysql";
                     conectarMySQL();
                     break;
                 case 3:
