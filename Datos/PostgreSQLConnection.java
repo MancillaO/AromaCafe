@@ -8,17 +8,15 @@ import java.sql.SQLException;
 
 public class PostgreSQLConnection {
 
-    private static final String POSTGRESQL_URL = "jdbc:postgresql://localhost:5432/aroma_y_cafe";
-    private static final String POSTGRESQL_USER = "postgres";
-    private static final String POSTGRESQL_PASSWORD = "1417a";
+    private static final String POSTGRESQL_URL = EnvLoader.get("POSTGRESQL_URL");
+    private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
+    private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
 
-    public static Connection getConnection() throws SQLException {
+    public Connection getConnection() throws SQLException {
         try {
-            //Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
         } catch (SQLException e) {
-            e.printStackTrace();
-            throw new SQLException("No se pudo cargar el driver JDBC", e);
+            throw new SQLException("No se pudo conectar a la base de datos", e);
         }
     }
 
