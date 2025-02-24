@@ -11,16 +11,19 @@ public class Menu {
     public void iniciar() {
         int opcion = 0;
         while (opcion != 3) {
-            System.out.println("|=========================================================|");
-            System.out.println("|                 Bienvenido a Aroma y Café               |");
-            System.out.println("|                  \"Un cafe, mil momentos\"                |");
-            System.out.println("|=========================================================|");
-            System.out.println("|Seleccione la base de datos a la que desea conectarse:   |");
-            System.out.println("|1. PostgreSQL                                            |");
-            System.out.println("|2. MySQL                                                 |");
-            System.out.println("|3. Salir                                                 |");
-            System.out.println("|=========================================================|");
-            System.out.print("Opción: ");
+            System.out.println("|===========================================================|");
+            System.out.println("|                 Bienvenido a Aroma y Cafe                 |");
+            System.out.println("|                  \"Un cafe, mil momentos\"                  |");
+            System.out.println("|===========================================================|");
+            System.out.println("|                                                           |");
+            System.out.println("| Seleccione la base de datos a la que desea conectarse:    |");
+            System.out.println("|                                                           |");
+            System.out.println("| 1. PostgreSQL                                             |");
+            System.out.println("| 2. MySQL                                                  |");
+            System.out.println("| 3. Salir                                                  |");
+            System.out.println("|                                                           |");
+            System.out.println("|===========================================================|");
+            System.out.print("Selecciona una opcion: ");
             opcion = scanner.nextInt();
 
             switch (opcion) {
@@ -34,7 +37,7 @@ public class Menu {
                     System.out.println("Saliendo...");
                     break;
                 default:
-                    System.out.println("Opción no válida. Intente de nuevo.");
+                    System.out.println("Opcion no válida. Intente de nuevo.");
             }
         }
     }
@@ -44,20 +47,18 @@ public class Menu {
 
         try (Connection conn = postgres.getConnection()) {
             if (conn != null) {
-                System.out.println("Conexión exitosa a PostgreSQL.");
-                System.out.println("|=========================================================|");
-                System.out.println("|                          Menu                           |");
-                System.out.println("|                      Aroma y Cafe                       |");
-                System.out.println("|                 \"Un cafe, mil momentos\"               |");
-                System.out.println("|=========================================================|");
-                System.out.println("|¿Alguna preferencia de tu eleccion en este momento?      |");
-                System.out.println("|1. Bebidas calientes                                     |");
-                System.out.println("|2. Bebidas Frias                                         |");
-                System.out.println("|3. Platillos Salados                                     |");
-                System.out.println("|4. Platillos Dulces                                      |");
-                System.out.println("|5. Platillos Veganos                                     |");
-                System.out.println("|6. Platillos Veganos                                     |");
-                System.out.println("|=========================================================|");
+                System.out.println("\nConexion exitosa a PostgreSQL.");
+                System.out.println("|===========================================================|");
+                System.out.println("|                           Menu                            |");
+                System.out.println("|                       Aroma y Cafe                        |");
+                System.out.println("|                 \"Un cafe, mil momentos\"                   |");
+                System.out.println("|===========================================================|");
+                System.out.println("|                                                           |");
+                System.out.println("| ¿Alguna preferencia de tu eleccion en este momento?       |");
+                System.out.println("|                                                           |");
+                postgres.listCategorias();
+                System.out.println("|                                                           |");
+                System.out.println("|===========================================================|");
                 System.out.print("Selecciona una opcion: ");
 
                 int opcion = scanner.nextInt();

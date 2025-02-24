@@ -1,7 +1,7 @@
 CREATE DATABASE aroma_y_cafe;
 USE aroma_y_cafe;
 
--- Tabla de categorías
+-- Tabla de categorias
 CREATE TABLE categorias (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
@@ -35,7 +35,7 @@ CREATE TABLE detalles_pedido (
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
 );
 
--- Insertar categorías
+-- Insertar categorias
 INSERT INTO categorias (nombre) VALUES
 ('Bebidas Calientes'),
 ('Bebidas Frias'),
@@ -45,24 +45,24 @@ INSERT INTO categorias (nombre) VALUES
 
 -- Insertar productos
 INSERT INTO productos (nombre, categoria_id, precio, descripcion) VALUES
-('Café Espresso', 1, 65.00, 'Un clásico, fuerte y concentrado.'),
-('Café Americano', 1, 70.00, 'Espresso con agua caliente.'),
-('Capuccino', 1, 75.00, 'Café espresso con leche espumosa.'),
-('Latte', 1, 70.00, 'Café con mucha leche vaporizada.'),
-('Mocha', 1, 70.00, 'Café con chocolate y leche vaporizada.'),
-('Té helado', 2, 20.00, 'Té helado de limón con miel.'),
+('Cafe Espresso', 1, 65.00, 'Un clasico, fuerte y concentrado.'),
+('Cafe Americano', 1, 70.00, 'Espresso con agua caliente.'),
+('Capuccino', 1, 75.00, 'Cafe espresso con leche espumosa.'),
+('Latte', 1, 70.00, 'Cafe con mucha leche vaporizada.'),
+('Mocha', 1, 70.00, 'Cafe con chocolate y leche vaporizada.'),
+('Te helado', 2, 20.00, 'Te helado de limon con miel.'),
 ('Soda', 2, 20.00, 'Refresco burbujeante y muy refrescante.'),
-('Limonada', 2, 25.00, 'Muy refrescante con limones recién recolectados.'),
-('Iced Latte', 2, 30.00, 'Café con hielo y leche. Algo clásico.'),
-('Club Sándwich', 3, 40.00, 'Con bacon, lechuga, salchicha y aderezo especial.'),
+('Limonada', 2, 25.00, 'Muy refrescante con limones recien recolectados.'),
+('Iced Latte', 2, 30.00, 'Cafe con hielo y leche. Algo clasico.'),
+('Club Sandwich', 3, 40.00, 'Con bacon, lechuga, salchicha y aderezo especial.'),
 ('Ensalada Cesar', 3, 45.00, 'Lechuga, pollo a la parrilla, aderezo y queso panela.'),
-('Torta clásica', 3, 30.00, 'Jamón, queso panela y aderezo.'),
+('Torta clasica', 3, 30.00, 'Jamon, queso panela y aderezo.'),
 ('Wrap de pollo', 3, 45.00, 'Con ensalada y salsa secreta.'),
-('Churros', 4, 40.00, 'Con chocolate y azúcar glas.'),
-('Cheescake', 4, 30.00, 'Con frutas frescas, recién recolectadas.'),
+('Churros', 4, 40.00, 'Con chocolate y azucar glas.'),
+('Cheescake', 4, 30.00, 'Con frutas frescas, recien recolectadas.'),
 ('Tarta', 4, 45.00, 'Con mermelada de manzana y suero de frutas frescas.'),
 ('Brownies', 4, 45.00, 'De chocolate con chispas.'),
 ('Batido de frutas', 5, 35.00, 'Con leche de almendras.'),
-('Sándwich de Tofu', 5, 45.00, 'Con tofu y verduras a la parrilla.'),
-('Palitos de Humus', 5, 20.00, 'Acompañados de humus casero.'),
-('Emparedado de seitán', 5, 45.00, 'A base de trigo. Un delicioso sustituto de la carne.');
+('Sandwich de Tofu', 5, 45.00, 'Con tofu y verduras a la parrilla.'),
+('Palitos de Humus', 5, 20.00, 'Acompanados de humus casero.'),
+('Emparedado de seitan', 5, 45.00, 'A base de trigo. Un delicioso sustituto de la carne.');
