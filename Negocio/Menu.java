@@ -3,10 +3,12 @@ package Negocio;
 import Datos.PostgreSQLConnection;
 import Datos.MySQLConnection;
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Menu {
     private Scanner scanner = new Scanner(System.in);
+    String cone;
 
     public void iniciar() {
         int opcion = 0;
@@ -28,7 +30,7 @@ public class Menu {
 
             switch (opcion) {
                 case 1:
-                    conectarPostgreSQL();
+                    mostraMenu();
                     break;
                 case 2:
                     conectarMySQL();
@@ -42,7 +44,7 @@ public class Menu {
         }
     }
 
-    private void conectarPostgreSQL() {
+    private void mostraMenu() {
         PostgreSQLConnection postgres = new PostgreSQLConnection();
 
         try (Connection conn = postgres.getConnection()) {
@@ -60,14 +62,31 @@ public class Menu {
                 System.out.println("|                                                           |");
                 System.out.println("|===========================================================|");
                 System.out.print("Selecciona una opcion: ");
+                int opcionCat = scanner.nextInt();
 
-                int opcion = scanner.nextInt();
-
-                if (opcion == 6) {
+                if (opcionCat == 6) {
                     System.out.println("Gracias por visitarnos. ¡Hasta pronto!");
                 }
-                if (opcion >= 1 && opcion <= 5) {
-                    postgres.listProductos(opcion);
+                if (opcionCat >= 1 && opcionCat <= 5) {
+                    while (true) {
+                        postgres.listProductos(opcionCat);
+                        System.out.print("Selecciona una opcion: ");
+                        int opcionProd = scanner.nextInt();
+                        postgres.mostrarProductoPorId(opcionProd);
+                        System.out.println("*************************************************************");
+                        System.out.println("\n¿Desea agregar? SI/NO");
+                        System.out.print("Selecciona: ");
+                        String opcionAdd = scanner.next();
+                        ArrayList<Integer> productosSeleccionados = new ArrayList<>();
+                        if (opcionAdd.equals("si")) {
+                            productosSeleccionados.add(opcionProd);
+                            System.out.println("\n¿Desea agregar otro producto? SI/NO");
+                            String opcionAdd2 = scanner.next();
+                            if (opcionAdd2.equals("no")) {
+                                break;
+                            }
+                        }
+                    }
 
                 } else {
                     System.out.println("Opción inválida, intenta de nuevo.");
