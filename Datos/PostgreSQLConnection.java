@@ -5,58 +5,42 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 
-public class PostgreSQLConnection {
+public class PostgreSQLConnection implements DatabaseConnection {
 
-    private static final String POSTGRESQL_URL = "jdbc:postgresql://localhost:5432/aroma_y_cafe";
-    private static final String POSTGRESQL_USER = "postgres";
-    private static final String POSTGRESQL_PASSWORD = "password";
+    private static final String POSTGRESQL_URL = EnvLoader.get("POSTGRESQL_URL");
+    private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
+    private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
 
-    public static Connection getConnection() throws SQLException {
+    @Override
+    public Connection getConnection() throws SQLException {
         try {
-            Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("No se pudo cargar el driver JDBC", e);
-        }
-    }
-
-    // CRUD para la tabla 'categorias'
-    public void insertCategoria(String nombre) {
-        String query = "INSERT INTO categorias (nombre) VALUES (?)";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nombre);
-            stmt.executeUpdate();
-            System.out.println("Categoría insertada correctamente en PostgreSQL.");
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new SQLException("No se pudo conectar a la base de datos", e);
         }
     }
 
     public void listCategorias() {
         String query = "SELECT * FROM categorias";
+        final int LINE_WIDTH = 60;
+        final int MARGIN = 1;
+
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
-    public void deleteCategoria(int id) {
-        String query = "DELETE FROM categorias WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Categoría eliminada correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ninguna categoría con ID " + id + " en PostgreSQL.");
+            while (rs.next()) {
+                StringBuilder line = new StringBuilder();
+                line.append("|");
+                line.append(" ".repeat(MARGIN));
+                String categoryText = rs.getInt("id") + ". " + rs.getString("nombre");
+                line.append(categoryText);
+                int remainingSpace = LINE_WIDTH - categoryText.length() - MARGIN - 1;
+                line.append(" ".repeat(remainingSpace));
+                line.append("|");
+                System.out.println(line.toString());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -80,67 +64,52 @@ public class PostgreSQLConnection {
         }
     }
 
-    // CRUD para la tabla 'productos'
-    public void insertProducto(String nombre, int categoriaId, double precio, String descripcion) {
-        String query = "INSERT INTO productos (nombre, categoria_id, precio, descripcion) VALUES (?, ?, ?, ?)";
+    public void listProductos(int categoriaId) {
+        String query = "SELECT * FROM productos WHERE categoria_id = ?";
+        final int LINE_WIDTH = 59;
+        final int MARGIN = 1;
+
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nombre);
-            stmt.setInt(2, categoriaId);
-            stmt.setDouble(3, precio);
-            stmt.setString(4, descripcion);
-            stmt.executeUpdate();
-            System.out.println("Producto insertado correctamente en PostgreSQL.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void listProductos() {
-        String query = "SELECT * FROM productos";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
+            stmt.setInt(1, categoriaId);
+            ResultSet rs = stmt.executeQuery();
+            System.out.println("\n|===========================================================|");
+            System.out.println("|                   Productos disponibles                   |");
+            System.out.println("|===========================================================|");
+            System.out.println("|                                                           |");
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre") +
-                        ", Precio: " + rs.getDouble("precio") + ", Descripción: " + rs.getString("descripcion"));
+                StringBuilder line = new StringBuilder();
+                line.append("|");
+                line.append(" ".repeat(MARGIN));
+                String id = String.valueOf(rs.getInt("id"));
+                String nombre = rs.getString("nombre");
+                String precio = String.format("$%d", rs.getInt("precio"));
+                String productText = id + ". " + nombre + " ";
+                line.append(productText);
+                int dashesLength = LINE_WIDTH - productText.length() - precio.length() - MARGIN - 2;
+                line.append("-".repeat(dashesLength));
+                line.append(" " + precio);
+                line.append(" |");
+                System.out.println(line.toString());
             }
+            System.out.println("|                                                           |");
+            System.out.println("|===========================================================|\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void deleteProducto(int id) {
-        String query = "DELETE FROM productos WHERE id = ?";
+    public void mostrarProductoPorId(int id) {
+        String query = "SELECT * FROM productos WHERE id = ?";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Producto eliminado correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ningún producto con ID " + id + " en PostgreSQL.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateProducto(int id, String nuevoNombre, int nuevaCategoriaId, double nuevoPrecio,
-            String nuevaDescripcion) {
-        String query = "UPDATE productos SET nombre = ?, categoria_id = ?, precio = ?, descripcion = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nuevoNombre);
-            stmt.setInt(2, nuevaCategoriaId);
-            stmt.setDouble(3, nuevoPrecio);
-            stmt.setString(4, nuevaDescripcion);
-            stmt.setInt(5, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Producto actualizado correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ningún producto con ID " + id + " en PostgreSQL.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    System.out.println("\n" + rs.getString("nombre") + ": " + rs.getString("descripcion") + "\n");
+                } else {
+                    System.out.println("No se encontró ningún producto con el ID: " + id);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -149,10 +118,13 @@ public class PostgreSQLConnection {
 
     // CRUD para la tabla 'pedidos'
     public void insertPedido(double total) {
-        String query = "INSERT INTO pedidos (total) VALUES (?)";
+        Calendar calendario = Calendar.getInstance();
+        java.sql.Date fechaSQL = new java.sql.Date(calendario.getTimeInMillis());
+        String query = "INSERT INTO pedidos (fecha, total) VALUES (?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(1, total);
+            stmt.setDouble(2, total);
+            stmt.setDate(1, fechaSQL);
             stmt.executeUpdate();
             System.out.println("Pedido insertado correctamente en PostgreSQL.");
         } catch (SQLException e) {

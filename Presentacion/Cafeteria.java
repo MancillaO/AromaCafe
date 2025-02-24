@@ -1,6 +1,10 @@
 package Presentacion;
+import Negocio.Menu;
 
 public class Cafeteria {
-    Menu menu = new Menu();
-    menu.iniciar();
+    public static void main(String[] args) {
+        Menu menu = new Menu();
+        menu.iniciar();
+    }
+
 }
