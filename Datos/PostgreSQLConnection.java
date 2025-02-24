@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Collections;
 
 public class PostgreSQLConnection implements DatabaseConnection {
 
@@ -109,6 +110,45 @@ public class PostgreSQLConnection implements DatabaseConnection {
                     System.out.println("\n" + rs.getString("nombre") + ": " + rs.getString("descripcion") + "\n");
                 } else {
                     System.out.println("No se encontró ningún producto con el ID: " + id);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void resumenOrden(int[] ids) {
+        final int LINE_WIDTH = 60;
+        final int MARGIN = 1;
+        if (ids == null || ids.length == 0) {
+            System.out.println("No se proporcionaron IDs para buscar.");
+            return;
+        }
+        String query = "SELECT * FROM productos WHERE id IN (" + String.join(",", Collections.nCopies(ids.length, "?"))
+                + ")";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            for (int i = 0; i < ids.length; i++) {
+                stmt.setInt(i + 1, ids[i]);
+            }
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                boolean encontrado = false;
+                while (rs.next()) {
+                    encontrado = true;
+                    StringBuilder line = new StringBuilder();
+                    line.append("|");
+                    line.append(" ".repeat(MARGIN));
+                    String categoryText = rs.getString("nombre") + " $" + rs.getInt("precio");
+                    line.append(categoryText);
+                    int remainingSpace = LINE_WIDTH - categoryText.length() - MARGIN - 1;
+                    line.append(" ".repeat(remainingSpace));
+                    line.append("|");
+                    System.out.println(line.toString());
+                }
+                if (!encontrado) {
+                    System.out.println("No se encontraron productos con los IDs proporcionados.");
                 }
             }
         } catch (SQLException e) {

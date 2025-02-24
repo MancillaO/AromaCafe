@@ -81,6 +81,48 @@ public class MySQLConnection implements DatabaseConnection {
         }
     }
 
+    public void resumenOrden(int[] ids) {
+        // Verificar si el array de IDs está vacío
+        if (ids == null || ids.length == 0) {
+            System.out.println("No se proporcionaron IDs para buscar.");
+            return;
+        }
+
+        // Construir la consulta SQL con la cláusula IN
+        String query = "SELECT id, nombre, descripcion FROM productos WHERE id IN (" +
+                String.join(",", java.util.Collections.nCopies(ids.length, "?")) + ")";
+
+        try (Connection conn = getConnection(); // Obtener conexión a la base de datos
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Asignar los valores de los IDs al PreparedStatement
+            for (int i = 0; i < ids.length; i++) {
+                stmt.setInt(i + 1, ids[i]);
+            }
+
+            // Ejecutar la consulta y procesar los resultados
+            try (ResultSet rs = stmt.executeQuery()) {
+                boolean encontrado = false;
+
+                while (rs.next()) {
+                    encontrado = true;
+                    int id = rs.getInt("id");
+                    String nombre = rs.getString("nombre");
+                    String descripcion = rs.getString("descripcion");
+
+                    // Mostrar los detalles del producto
+                    System.out.println("ID: " + id + ", Nombre: " + nombre + ", Descripción: " + descripcion);
+                }
+
+                if (!encontrado) {
+                    System.out.println("No se encontraron productos con los IDs proporcionados.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // CRUD para la tabla 'pedidos'
     public void insertPedido(double total) {
         String query = "INSERT INTO pedidos (total) VALUES (?)";
