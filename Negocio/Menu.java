@@ -147,8 +147,9 @@ public class Menu {
         if (opcion.equalsIgnoreCase("a")) {
             mostrarCategorias(dbConnection);
         } else if (opcion.equalsIgnoreCase("c")) {
-            //Logica para insertar pedido
-            System.out.println("Pedido confirmado. Gracias por su compra.");
+            double total = dbConnection.calcularTotalOrden(productosSeleccionados);
+            dbConnection.insertPedido(total);
+            System.out.println(total);
         } else {
             System.out.println("Opción inválida. Intente de nuevo.");
         }

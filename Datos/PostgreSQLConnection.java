@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Collections;
 
 public class PostgreSQLConnection implements DatabaseConnection {
@@ -156,15 +155,48 @@ public class PostgreSQLConnection implements DatabaseConnection {
         }
     }
 
+    public double calcularTotalOrden(int[] ids) {
+        // Validar entrada
+        if (ids == null || ids.length == 0) {
+            System.out.println("No se proporcionaron IDs para calcular el total.");
+            return 0.0;
+        }
+
+        // Query para obtener los precios de los productos
+        String query = "SELECT precio FROM productos WHERE id IN ("
+                + String.join(",", Collections.nCopies(ids.length, "?")) + ")";
+        double total = 0.0;
+
+        try (Connection conn = getConnection(); // Asegúrate de que getConnection() esté implementado
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Asignar los IDs al PreparedStatement
+            for (int i = 0; i < ids.length; i++) {
+                stmt.setInt(i + 1, ids[i]);
+            }
+
+            // Ejecutar la consulta
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Sumar el precio de cada producto al total
+                    total += rs.getDouble("precio");
+                }
+            }
+
+        } catch (SQLException e) {
+            // Manejar errores de la base de datos
+            System.err.println("Error al calcular el total de la orden: " + e.getMessage());
+        }
+
+        return total;
+    }
+
     // CRUD para la tabla 'pedidos'
     public void insertPedido(double total) {
-        Calendar calendario = Calendar.getInstance();
-        java.sql.Date fechaSQL = new java.sql.Date(calendario.getTimeInMillis());
-        String query = "INSERT INTO pedidos (fecha, total) VALUES (?, ?)";
+        String query = "INSERT INTO pedidos (total) VALUES (?)";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(2, total);
-            stmt.setDate(1, fechaSQL);
+            stmt.setDouble(1, total);
             stmt.executeUpdate();
             System.out.println("Pedido insertado correctamente en PostgreSQL.");
         } catch (SQLException e) {

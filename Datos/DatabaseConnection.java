@@ -10,4 +10,5 @@ public interface DatabaseConnection {
     void mostrarProductoPorId(int productoId);
     void resumenOrden(int[] ids);
     void insertPedido(double total);
+    double calcularTotalOrden(int[] ids);
 }
