@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MySQLConnection {
+public class MySQLConnection implements DatabaseConnection {
 
     private static final String MYSQL_URL = EnvLoader.get("MYSQL_URL");
     private static final String MYSQL_USER = EnvLoader.get("MYSQL_USER");
@@ -20,19 +20,6 @@ public class MySQLConnection {
         }
     }
 
-    // CRUD para la tabla 'categorias'
-    public void insertCategoria(String nombre) {
-        String query = "INSERT INTO categorias (nombre) VALUES (?)";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nombre);
-            stmt.executeUpdate();
-            System.out.println("Categoría insertada correctamente en MySQL.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void listCategorias() {
         String query = "SELECT * FROM categorias";
         try (Connection conn = getConnection();
@@ -40,22 +27,6 @@ public class MySQLConnection {
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteCategoria(int id) {
-        String query = "DELETE FROM categorias WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Categoría eliminada correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ninguna categoría con ID " + id + " en MySQL.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -79,23 +50,7 @@ public class MySQLConnection {
         }
     }
 
-    // CRUD para la tabla 'productos'
-    public void insertProducto(String nombre, int categoriaId, double precio, String descripcion) {
-        String query = "INSERT INTO productos (nombre, categoria_id, precio, descripcion) VALUES (?, ?, ?, ?)";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nombre);
-            stmt.setInt(2, categoriaId);
-            stmt.setDouble(3, precio);
-            stmt.setString(4, descripcion);
-            stmt.executeUpdate();
-            System.out.println("Producto insertado correctamente en MySQL.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void listProductos() {
+    public void listProductos(int categoriaId) {
         String query = "SELECT * FROM productos";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
@@ -109,37 +64,17 @@ public class MySQLConnection {
         }
     }
 
-    public void deleteProducto(int id) {
-        String query = "DELETE FROM productos WHERE id = ?";
+    public void mostrarProductoPorId(int id) {
+        String query = "SELECT * FROM productos WHERE id = ?";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Producto eliminado correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ningún producto con ID " + id + " en MySQL.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updateProducto(int id, String nuevoNombre, int nuevaCategoriaId, double nuevoPrecio,
-            String nuevaDescripcion) {
-        String query = "UPDATE productos SET nombre = ?, categoria_id = ?, precio = ?, descripcion = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nuevoNombre);
-            stmt.setInt(2, nuevaCategoriaId);
-            stmt.setDouble(3, nuevoPrecio);
-            stmt.setString(4, nuevaDescripcion);
-            stmt.setInt(5, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Producto actualizado correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ningún producto con ID " + id + " en MySQL.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    System.out.println("\n" + rs.getString("nombre") + ": " + rs.getString("descripcion") + "\n");
+                } else {
+                    System.out.println("No se encontró ningún producto con el ID: " + id);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

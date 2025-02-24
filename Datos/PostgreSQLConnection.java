@@ -7,12 +7,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-public class PostgreSQLConnection {
+public class PostgreSQLConnection implements DatabaseConnection {
 
     private static final String POSTGRESQL_URL = EnvLoader.get("POSTGRESQL_URL");
     private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
     private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
 
+    @Override
     public Connection getConnection() throws SQLException {
         try {
             return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
@@ -122,7 +123,7 @@ public class PostgreSQLConnection {
         String query = "INSERT INTO pedidos (fecha, total) VALUES (?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(2,total );
+            stmt.setDouble(2, total);
             stmt.setDate(1, fechaSQL);
             stmt.executeUpdate();
             System.out.println("Pedido insertado correctamente en PostgreSQL.");
