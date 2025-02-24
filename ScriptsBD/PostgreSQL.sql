@@ -23,7 +23,7 @@ CREATE TABLE productos (
 CREATE TABLE pedidos (
     id SERIAL PRIMARY KEY,
     fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total DECIMAL(10, 2) NOT NULL
+    total DECIMAL(10, 2)
 );
 
 -- Tabla de detalles del pedido
@@ -52,7 +52,7 @@ INSERT INTO productos (nombre, categoria_id, precio, descripcion) VALUES
 ('Capuccino', 1, 75.00, 'Cafe espresso con leche espumosa.'),
 ('Latte', 1, 70.00, 'Cafe con mucha leche vaporizada.'),
 ('Mocha', 1, 70.00, 'Cafe con chocolate y leche vaporizada.'),
-('Te helado', 2, 20.00, 'Te helado de limón con miel.'),
+('Te helado', 2, 20.00, 'Te helado de limon con miel.'),
 ('Soda', 2, 20.00, 'Refresco burbujeante y muy refrescante.'),
 ('Limonada', 2, 25.00, 'Muy refrescante con limones recien recolectados.'),
 ('Iced Latte', 2, 30.00, 'Cafe con hielo y leche. Algo clasico.'),
