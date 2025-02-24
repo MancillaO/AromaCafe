@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 
 public class MySQLConnection implements DatabaseConnection {
 
@@ -121,6 +122,42 @@ public class MySQLConnection implements DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public double calcularTotalOrden(int[] ids) {
+        // Validar entrada
+        if (ids == null || ids.length == 0) {
+            System.out.println("No se proporcionaron IDs para calcular el total.");
+            return 0.0;
+        }
+
+        // Query para obtener los precios de los productos
+        String query = "SELECT precio FROM productos WHERE id IN ("
+                + String.join(",", Collections.nCopies(ids.length, "?")) + ")";
+        double total = 0.0;
+
+        try (Connection conn = getConnection(); // Obtener la conexión
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Asignar los IDs al PreparedStatement
+            for (int i = 0; i < ids.length; i++) {
+                stmt.setInt(i + 1, ids[i]);
+            }
+
+            // Ejecutar la consulta
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Sumar el precio de cada producto al total
+                    total += rs.getDouble("precio");
+                }
+            }
+
+        } catch (SQLException e) {
+            // Manejar errores de la base de datos
+            System.err.println("Error al calcular el total de la orden: " + e.getMessage());
+        }
+
+        return total;
     }
 
     // CRUD para la tabla 'pedidos'
