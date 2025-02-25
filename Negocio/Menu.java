@@ -99,7 +99,7 @@ public class Menu {
             System.out.print("Selecciona una opción: ");
             int opcionProd = scanner.nextInt();
             dbConnection.mostrarProductoPorId(opcionProd);
-            System.out.println("\n¿Desea agregar este producto? SI/NO");
+            System.out.println("¿Desea agregar este producto? SI/NO");
             System.out.print("Selecciona: ");
             String opcionAdd = scanner.next();
             if (opcionAdd.equalsIgnoreCase("si")) {
