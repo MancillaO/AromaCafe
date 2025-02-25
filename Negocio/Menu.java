@@ -11,6 +11,28 @@ public class Menu {
     private Scanner scanner = new Scanner(System.in);
     private ArrayList<Integer> productosSeleccionados = new ArrayList<>();
 
+    private void ConectarPostgres() {
+        PostgreSQLConnection postgres = new PostgreSQLConnection();
+        try (Connection conn = postgres.getConnection()) {
+            if (conn != null) {
+                menuInicio(postgres);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al conectar a PostgreSQL: " + e.getMessage());
+        }
+    }
+
+    private void conectarMySQL() {
+        MySQLConnection mysql = new MySQLConnection();
+        try (Connection conn = mysql.getConnection()) {
+            if (conn != null) {
+                menuInicio(mysql);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al conectar a MySQL: " + e.getMessage());
+        }
+    }
+
     public void iniciar() {
         int opcion = 0;
         while (opcion != 3) {
@@ -45,25 +67,35 @@ public class Menu {
         }
     }
 
-    private void ConectarPostgres() {
-        PostgreSQLConnection postgres = new PostgreSQLConnection();
-        try (Connection conn = postgres.getConnection()) {
-            if (conn != null) {
-                mostrarCategorias(postgres);
-            }
-        } catch (Exception e) {
-            System.out.println("Error al conectar a PostgreSQL: " + e.getMessage());
-        }
-    }
+    private void menuInicio(DatabaseConnection dbConnection) {
+        System.out.println("\n|===========================================================|");
+        System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
+        System.out.println("|                  \"UN CAFE, MIL MOMENTOS\"                  |");
+        System.out.println("|===========================================================|");
+        System.out.println("|                                                           |");
+        System.out.println("| Esperamos que te sientas genial.                          |");
+        System.out.println("| ¿Que deseas hacer?                                        |");
+        System.out.println("|                                                           |");
+        System.out.println("| 1. Menu                                                   |");
+        System.out.println("| 2. Consultar Orden                                        |");
+        System.out.println("| 3. Salir                                                  |");
+        System.out.println("|                                                           |");
+        System.out.println("|===========================================================|");
+        System.out.print("Selecciona una opcion: ");
+        int opcion = scanner.nextInt();
 
-    private void conectarMySQL() {
-        MySQLConnection mysql = new MySQLConnection();
-        try (Connection conn = mysql.getConnection()) {
-            if (conn != null) {
-                mostrarCategorias(mysql);
-            }
-        } catch (Exception e) {
-            System.out.println("Error al conectar a MySQL: " + e.getMessage());
+        switch (opcion) {
+            case 1:
+                mostrarCategorias(dbConnection);
+                break;
+            case 2:
+                System.out.println("Funcion en desarrollo...");
+                break;
+            case 3:
+                System.out.println("Saliendo...");
+                break;
+            default:
+                break;
         }
     }
 
@@ -106,7 +138,7 @@ public class Menu {
                 productosSeleccionados.add(opcionProd);
                 // System.out.println(productosSeleccionados);
                 while (true) {
-                    System.out.println("\n¿Desea agregar otro producto? SI/NO");
+                    System.out.println("\n¿Desea algo mas? SI/NO");
                     System.out.print("Selecciona: ");
                     String opcionAdd2 = scanner.next();
                     if (opcionAdd2.equalsIgnoreCase("si")) {
@@ -145,14 +177,13 @@ public class Menu {
         } else if (opcion.equalsIgnoreCase("c")) {
             double total = dbConnection.calcularTotalOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
             int idPedido = dbConnection.insertPedido(total);
-
             for (int idProducto : productosSeleccionados) {
                 dbConnection.insertDetallePedido(idPedido, idProducto);
             }
-
+            menuInicio(dbConnection);
         } else {
             System.out.println("Opción inválida. Intente de nuevo.");
+            resumenOrden(dbConnection);
         }
-
     }
 }
