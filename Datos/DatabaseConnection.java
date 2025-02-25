@@ -2,6 +2,7 @@ package Datos;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface DatabaseConnection {
     Connection getConnection() throws SQLException;
@@ -12,4 +13,6 @@ public interface DatabaseConnection {
     int insertPedido(double total);
     double calcularTotalOrden(int[] ids);
     void insertDetallePedido(int pedidoId, int productoId);
+    boolean isProductInCategory(int productId, int categoryId);
+    List<Integer> getValidCategoryIds();
 }
