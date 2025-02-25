@@ -23,11 +23,23 @@ public class MySQLConnection implements DatabaseConnection {
 
     public void listCategorias() {
         String query = "SELECT * FROM categorias";
+        final int LINE_WIDTH = 60;
+        final int MARGIN = 1;
+
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre"));
+                StringBuilder line = new StringBuilder();
+                line.append("|");
+                line.append(" ".repeat(MARGIN));
+                String categoryText = rs.getInt("id") + ". " + rs.getString("nombre");
+                line.append(categoryText);
+                int remainingSpace = LINE_WIDTH - categoryText.length() - MARGIN - 1;
+                line.append(" ".repeat(remainingSpace));
+                line.append("|");
+                System.out.println(line.toString());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -52,14 +64,38 @@ public class MySQLConnection implements DatabaseConnection {
     }
 
     public void listProductos(int categoriaId) {
-        String query = "SELECT * FROM productos";
+        String query = "SELECT * FROM productos WHERE categoria_id = ?";
+        final int LINE_WIDTH = 59;
+        final int MARGIN = 1;
+
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, categoriaId);
+            ResultSet rs = stmt.executeQuery();
+
+            System.out.println("\n|===========================================================|");
+            System.out.println("|                   Productos disponibles                   |");
+            System.out.println("|===========================================================|");
+            System.out.println("|                                                           |");
+
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Nombre: " + rs.getString("nombre") +
-                        ", Precio: " + rs.getDouble("precio") + ", Descripción: " + rs.getString("descripcion"));
+                StringBuilder line = new StringBuilder();
+                line.append("|");
+                line.append(" ".repeat(MARGIN));
+                String id = String.valueOf(rs.getInt("id"));
+                String nombre = rs.getString("nombre");
+                String precio = String.format("$%d", rs.getInt("precio"));
+                String productText = id + ". " + nombre + " ";
+                line.append(productText);
+                int dashesLength = LINE_WIDTH - productText.length() - precio.length() - MARGIN - 2;
+                line.append("-".repeat(dashesLength));
+                line.append(" " + precio);
+                line.append(" |");
+                System.out.println(line.toString());
             }
+
+            System.out.println("|                                                           |");
+            System.out.println("|===========================================================|\n");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -83,38 +119,35 @@ public class MySQLConnection implements DatabaseConnection {
     }
 
     public void resumenOrden(int[] ids) {
-        // Verificar si el array de IDs está vacío
+        final int LINE_WIDTH = 60;
+        final int MARGIN = 1;
         if (ids == null || ids.length == 0) {
             System.out.println("No se proporcionaron IDs para buscar.");
             return;
         }
-
-        // Construir la consulta SQL con la cláusula IN
-        String query = "SELECT id, nombre, descripcion FROM productos WHERE id IN (" +
-                String.join(",", java.util.Collections.nCopies(ids.length, "?")) + ")";
-
-        try (Connection conn = getConnection(); // Obtener conexión a la base de datos
+        String query = "SELECT * FROM productos WHERE id IN (" +
+                String.join(",", Collections.nCopies(ids.length, "?")) + ")";
+        try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            // Asignar los valores de los IDs al PreparedStatement
             for (int i = 0; i < ids.length; i++) {
                 stmt.setInt(i + 1, ids[i]);
             }
 
-            // Ejecutar la consulta y procesar los resultados
             try (ResultSet rs = stmt.executeQuery()) {
                 boolean encontrado = false;
-
                 while (rs.next()) {
                     encontrado = true;
-                    int id = rs.getInt("id");
-                    String nombre = rs.getString("nombre");
-                    String descripcion = rs.getString("descripcion");
-
-                    // Mostrar los detalles del producto
-                    System.out.println("ID: " + id + ", Nombre: " + nombre + ", Descripción: " + descripcion);
+                    StringBuilder line = new StringBuilder();
+                    line.append("|");
+                    line.append(" ".repeat(MARGIN));
+                    String categoryText = rs.getString("nombre") + " $" + rs.getInt("precio");
+                    line.append(categoryText);
+                    int remainingSpace = LINE_WIDTH - categoryText.length() - MARGIN - 1;
+                    line.append(" ".repeat(remainingSpace));
+                    line.append("|");
+                    System.out.println(line.toString());
                 }
-
                 if (!encontrado) {
                     System.out.println("No se encontraron productos con los IDs proporcionados.");
                 }
@@ -163,30 +196,25 @@ public class MySQLConnection implements DatabaseConnection {
     // CRUD para la tabla 'pedidos'
     public int insertPedido(double total) {
         String insertQuery = "INSERT INTO pedidos (total) VALUES (?)";
-        String lastIdQuery = "SELECT LAST_INSERT_ID()"; // Consulta para obtener el último ID insertado
-        int pedidoId = -1; // Valor por defecto en caso de error
+        String lastIdQuery = "SELECT LAST_INSERT_ID()";
+        int pedidoId = -1;
 
         try (Connection conn = getConnection();
                 PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
                 PreparedStatement lastIdStmt = conn.prepareStatement(lastIdQuery)) {
-
-            // Insertar el pedido
             insertStmt.setDouble(1, total);
             insertStmt.executeUpdate();
 
-            // Obtener el ID generado
             try (ResultSet rs = lastIdStmt.executeQuery()) {
                 if (rs.next()) {
-                    pedidoId = rs.getInt(1); // Obtener el ID desde el ResultSet
-                    System.out.println("Pedido insertado correctamente en MySQL. ID del pedido: " + pedidoId);
+                    pedidoId = rs.getInt(1);
+                    System.out.println("\nPedido insertado correctamente en MySQL. ID del pedido: " + pedidoId);
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return pedidoId; // Retornar el ID del pedido
+        return pedidoId;
     }
 
     public void listPedidos() {
@@ -244,7 +272,7 @@ public class MySQLConnection implements DatabaseConnection {
             stmt.setInt(1, pedidoId);
             stmt.setInt(2, productoId);
             stmt.executeUpdate();
-            System.out.println("Detalle de pedido insertado correctamente en MySQL.");
+            // System.out.println("Detalle de pedido insertado correctamente en MySQL.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
