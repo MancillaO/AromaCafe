@@ -103,8 +103,8 @@ public class Menu {
             System.out.print("Selecciona: ");
             String opcionAdd = scanner.next();
             if (opcionAdd.equalsIgnoreCase("si")) {
-                productosSeleccionados.add(opcionProd); // Usa la variable de instancia
-                System.out.println(productosSeleccionados);
+                productosSeleccionados.add(opcionProd);
+                // System.out.println(productosSeleccionados);
                 while (true) {
                     System.out.println("\n¿Desea agregar otro producto? SI/NO");
                     System.out.print("Selecciona: ");
@@ -144,11 +144,10 @@ public class Menu {
             mostrarCategorias(dbConnection);
         } else if (opcion.equalsIgnoreCase("c")) {
             double total = dbConnection.calcularTotalOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
-            dbConnection.insertPedido(total);
+            int idPedido = dbConnection.insertPedido(total);
 
             for (int idProducto : productosSeleccionados) {
-                // logica para insertar detalle pedido
-                System.out.println("Agregando detalle: " + idProducto);
+                dbConnection.insertDetallePedido(idPedido, idProducto);
             }
 
         } else {

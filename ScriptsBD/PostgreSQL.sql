@@ -31,8 +31,7 @@ CREATE TABLE detalles_pedido (
     id SERIAL PRIMARY KEY,
     pedido_id INT NOT NULL,
     producto_id INT NOT NULL,
-    cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10, 2) NOT NULL,
+    precio_unitario DECIMAL(10, 2),
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
 );
@@ -68,3 +67,26 @@ INSERT INTO productos (nombre, categoria_id, precio, descripcion) VALUES
 ('Sandwich de Tofu', 5, 45.00, 'Con tofu y verduras a la parrilla.'),
 ('Palitos de Humus', 5, 20.00, 'Acompañados de humus casero.'),
 ('Emparedado de seitan', 5, 45.00, 'A base de trigo. Un delicioso sustituto de la carne.');
+
+-- Trigger para el precio de los detalles
+CREATE OR REPLACE FUNCTION actualizar_precio_unitario()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Buscar el precio del producto en la tabla productos
+    SELECT precio INTO NEW.precio_unitario
+    FROM productos
+    WHERE id = NEW.producto_id;
+
+    -- Si no se encuentra el precio, lanzar un error
+    IF NEW.precio_unitario IS NULL THEN
+        RAISE EXCEPTION 'No se encontró el precio del producto con ID %', NEW.producto_id;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_actualizar_precio_unitario
+BEFORE INSERT ON detalles_pedido
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_precio_unitario();

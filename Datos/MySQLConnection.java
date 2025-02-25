@@ -161,16 +161,32 @@ public class MySQLConnection implements DatabaseConnection {
     }
 
     // CRUD para la tabla 'pedidos'
-    public void insertPedido(double total) {
-        String query = "INSERT INTO pedidos (total) VALUES (?)";
+    public int insertPedido(double total) {
+        String insertQuery = "INSERT INTO pedidos (total) VALUES (?)";
+        String lastIdQuery = "SELECT LAST_INSERT_ID()"; // Consulta para obtener el último ID insertado
+        int pedidoId = -1; // Valor por defecto en caso de error
+
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(1, total);
-            stmt.executeUpdate();
-            System.out.println("Pedido insertado correctamente en MySQL.");
+                PreparedStatement insertStmt = conn.prepareStatement(insertQuery);
+                PreparedStatement lastIdStmt = conn.prepareStatement(lastIdQuery)) {
+
+            // Insertar el pedido
+            insertStmt.setDouble(1, total);
+            insertStmt.executeUpdate();
+
+            // Obtener el ID generado
+            try (ResultSet rs = lastIdStmt.executeQuery()) {
+                if (rs.next()) {
+                    pedidoId = rs.getInt(1); // Obtener el ID desde el ResultSet
+                    System.out.println("Pedido insertado correctamente en MySQL. ID del pedido: " + pedidoId);
+                }
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return pedidoId; // Retornar el ID del pedido
     }
 
     public void listPedidos() {
@@ -221,14 +237,12 @@ public class MySQLConnection implements DatabaseConnection {
     }
 
     // CRUD para la tabla 'detalles_pedido'
-    public void insertDetallePedido(int pedidoId, int productoId, int cantidad, double precioUnitario) {
-        String query = "INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
+    public void insertDetallePedido(int pedidoId, int productoId) {
+        String query = "INSERT INTO detalles_pedido (pedido_id, producto_id) VALUES (?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, pedidoId);
             stmt.setInt(2, productoId);
-            stmt.setInt(3, cantidad);
-            stmt.setDouble(4, precioUnitario);
             stmt.executeUpdate();
             System.out.println("Detalle de pedido insertado correctamente en MySQL.");
         } catch (SQLException e) {

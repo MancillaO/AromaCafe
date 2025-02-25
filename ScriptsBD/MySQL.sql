@@ -29,8 +29,7 @@ CREATE TABLE detalles_pedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     pedido_id INT NOT NULL,
     producto_id INT NOT NULL,
-    cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10, 2) NOT NULL,
+    precio_unitario DECIMAL(10, 2),
     FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
     FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE
 );
@@ -66,3 +65,26 @@ INSERT INTO productos (nombre, categoria_id, precio, descripcion) VALUES
 ('Sandwich de Tofu', 5, 45.00, 'Con tofu y verduras a la parrilla.'),
 ('Palitos de Humus', 5, 20.00, 'Acompanados de humus casero.'),
 ('Emparedado de seitan', 5, 45.00, 'A base de trigo. Un delicioso sustituto de la carne.');
+
+DELIMITER $$
+
+CREATE TRIGGER before_insert_detalles_pedido
+BEFORE INSERT ON detalles_pedido
+FOR EACH ROW
+BEGIN
+    -- Buscar el precio del producto en la tabla productos
+    DECLARE precio_producto DECIMAL(10, 2);
+
+    SELECT precio INTO precio_producto
+    FROM productos
+    WHERE id = NEW.producto_id;
+
+    -- Asignar el precio encontrado o NULL si no se encuentra
+    IF precio_producto IS NOT NULL THEN
+        SET NEW.precio_unitario = precio_producto;
+    ELSE
+        SET NEW.precio_unitario = NULL;
+    END IF;
+END$$
+
+DELIMITER ;
