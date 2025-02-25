@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class PostgreSQLConnection implements DatabaseConnection {
 
@@ -45,6 +47,22 @@ public class PostgreSQLConnection implements DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    // En PostgreSQLConnection.java
+    public List<Integer> getValidCategoryIds() {
+        List<Integer> validIds = new ArrayList<>();
+        String query = "SELECT id FROM categorias";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                validIds.add(rs.getInt("id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return validIds;
     }
 
     public void updateCategoria(int id, String nuevoNombre) {
@@ -97,6 +115,22 @@ public class PostgreSQLConnection implements DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isProductInCategory(int productId, int categoryId) {
+        String query = "SELECT COUNT(*) FROM productos WHERE id = ? AND categoria_id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, productId);
+            stmt.setInt(2, categoryId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void mostrarProductoPorId(int id) {
@@ -194,7 +228,7 @@ public class PostgreSQLConnection implements DatabaseConnection {
     // CRUD para la tabla 'pedidos'
     public int insertPedido(double total) {
         String query = "INSERT INTO pedidos (total) VALUES (?) RETURNING id";
-        int pedidoId = -1; 
+        int pedidoId = -1;
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDouble(1, total);
@@ -265,7 +299,8 @@ public class PostgreSQLConnection implements DatabaseConnection {
             stmt.setInt(1, pedidoId);
             stmt.setInt(2, productoId);
             stmt.executeUpdate();
-            // System.out.println("Detalle de pedido insertado correctamente en PostgreSQL.");
+            // System.out.println("Detalle de pedido insertado correctamente en
+            // PostgreSQL.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
