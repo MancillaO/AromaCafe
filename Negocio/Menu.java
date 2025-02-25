@@ -138,6 +138,7 @@ public class Menu {
                 System.out.println("\nOpcion no valida");
                 continue;
             }
+            System.out.println("\n=============================================================");
 
             dbConnection.mostrarProductoPorId(opcionProd);
             System.out.println("¿Desea agregar este producto? SI/NO");

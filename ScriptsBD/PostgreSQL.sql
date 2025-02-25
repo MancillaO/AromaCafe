@@ -1,6 +1,4 @@
 CREATE DATABASE aroma_y_cafe;
-
--- Conectar a la base de datos
 \c aroma_y_cafe;
 
 -- Tabla de categorías
