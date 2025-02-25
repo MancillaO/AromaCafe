@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class MySQLConnection implements DatabaseConnection {
 
@@ -44,6 +46,21 @@ public class MySQLConnection implements DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<Integer> getValidCategoryIds() {
+        List<Integer> validIds = new ArrayList<>();
+        String query = "SELECT id FROM categorias";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                validIds.add(rs.getInt("id"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return validIds;
     }
 
     public void updateCategoria(int id, String nuevoNombre) {
@@ -99,6 +116,22 @@ public class MySQLConnection implements DatabaseConnection {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isProductInCategory(int productId, int categoryId) {
+        String query = "SELECT COUNT(*) FROM productos WHERE id = ? AND categoria_id = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, productId);
+            stmt.setInt(2, categoryId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public void mostrarProductoPorId(int id) {
