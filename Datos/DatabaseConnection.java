@@ -9,7 +9,7 @@ public interface DatabaseConnection {
     void listProductos(int categoriaId);
     void mostrarProductoPorId(int productoId);
     void resumenOrden(int[] ids);
-    void insertPedido(double total);
+    int insertPedido(double total);
     double calcularTotalOrden(int[] ids);
-    void insertDetallePedido(int pedidoId, int productoId, int cantidad, double precioUnitario);
+    void insertDetallePedido(int pedidoId, int productoId);
 }

@@ -192,16 +192,22 @@ public class PostgreSQLConnection implements DatabaseConnection {
     }
 
     // CRUD para la tabla 'pedidos'
-    public void insertPedido(double total) {
-        String query = "INSERT INTO pedidos (total) VALUES (?)";
+    public int insertPedido(double total) {
+        String query = "INSERT INTO pedidos (total) VALUES (?) RETURNING id";
+        int pedidoId = -1; 
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDouble(1, total);
-            stmt.executeUpdate();
-            System.out.println("Pedido insertado correctamente en PostgreSQL.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    pedidoId = rs.getInt("id"); // Obtener el ID generado
+                    System.out.println("\nPedido insertado correctamente en PostgreSQL. ID del pedido: " + pedidoId);
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return pedidoId; // Retornar el ID del pedido
     }
 
     public void listPedidos() {
@@ -252,16 +258,14 @@ public class PostgreSQLConnection implements DatabaseConnection {
     }
 
     // CRUD para la tabla 'detalles_pedido'
-    public void insertDetallePedido(int pedidoId, int productoId, int cantidad, double precioUnitario) {
-        String query = "INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)";
+    public void insertDetallePedido(int pedidoId, int productoId) {
+        String query = "INSERT INTO detalles_pedido (pedido_id, producto_id) VALUES (?, ?)";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, pedidoId);
             stmt.setInt(2, productoId);
-            stmt.setInt(3, cantidad);
-            stmt.setDouble(4, precioUnitario);
             stmt.executeUpdate();
-            System.out.println("Detalle de pedido insertado correctamente en PostgreSQL.");
+            // System.out.println("Detalle de pedido insertado correctamente en PostgreSQL.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
