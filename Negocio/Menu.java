@@ -90,7 +90,7 @@ public class Menu {
                 mostrarCategorias(dbConnection);
                 break;
             case 2:
-                System.out.println("Funcion en desarrollo...");
+                System.out.println("\nFuncion en desarrollo...");
                 break;
             case 3:
                 System.out.println("Saliendo...");
@@ -145,7 +145,7 @@ public class Menu {
             System.out.print("Selecciona: ");
             String opcionAdd = scanner.next();
             if (opcionAdd.equalsIgnoreCase("si")) {
-                productosSeleccionados.add(opcionProd);
+                productosSeleccionados.add(opcionProd); 
                 // System.out.println(productosSeleccionados);
                 while (true) {
                     System.out.println("\n¿Desea algo mas? SI/NO");
