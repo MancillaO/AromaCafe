@@ -1,5 +1,5 @@
 // Crear base de datos
-use <aroma_y_cafe>
+use aroma_y_cafe
 
 // Crear colecciones
 db.createCollection("categorias")

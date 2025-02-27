@@ -36,12 +36,10 @@ public class Menu {
     }
     private void conectarMongoDB() {
         MongoDBConnection mongo = new MongoDBConnection();
-        try (Connection conn = mongo.getConnection()) {
-            if (conn != null) {
-                menuInicio(mongo);
-            }
+        try {
+            menuInicio(mongo);
         } catch (Exception e) {
-            System.out.println("Error al conectar a MySQL: " + e.getMessage());
+            System.out.println("Error al conectar a MongoDB: " + e.getMessage());
         }
     }
 
@@ -117,7 +115,6 @@ public class Menu {
 
     private void mostrarCategorias(DatabaseConnection dbConnection) {
         while (true) {
-            System.out.println("\nConexion exitosa.");
             System.out.println("|===========================================================|");
             System.out.println("|                         MI ORDEN                          |");
             System.out.println("|                       AROMA Y CAFE                        |");
