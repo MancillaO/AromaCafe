@@ -2,6 +2,7 @@ package Negocio;
 
 import Datos.PostgreSQLConnection;
 import Datos.DatabaseConnection;
+import Datos.MongoDBConnection;
 import Datos.MySQLConnection;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -33,6 +34,16 @@ public class Menu {
             System.out.println("Error al conectar a MySQL: " + e.getMessage());
         }
     }
+    private void conectarMongoDB() {
+        MongoDBConnection mongo = new MongoDBConnection();
+        try (Connection conn = mongo.getConnection()) {
+            if (conn != null) {
+                menuInicio(mongo);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al conectar a MySQL: " + e.getMessage());
+        }
+    }
 
     public void iniciar() {
         int opcion = 0;
@@ -46,7 +57,8 @@ public class Menu {
             System.out.println("|                                                           |");
             System.out.println("| 1. PostgreSQL                                             |");
             System.out.println("| 2. MySQL                                                  |");
-            System.out.println("| 3. Salir                                                  |");
+            System.out.println("| 3. MongoDB                                                |");
+            System.out.println("| 4. Salir                                                  |");
             System.out.println("|                                                           |");
             System.out.println("|===========================================================|");
             System.out.print("Selecciona una opcion: ");
@@ -60,6 +72,9 @@ public class Menu {
                     conectarMySQL();
                     break;
                 case 3:
+                    conectarMongoDB();
+                    break;
+                case 4:
                     System.out.println("Saliendo...");
                     break;
                 default:
@@ -71,7 +86,7 @@ public class Menu {
     private void menuInicio(DatabaseConnection dbConnection) {
         System.out.println("\n|===========================================================|");
         System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
-        System.out.println("|                  \"UN CAFE, MIL MOMENTOS\"                  |");
+        System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
         System.out.println("|===========================================================|");
         System.out.println("|                                                           |");
         System.out.println("| Esperamos que te sientas genial.                          |");
@@ -102,7 +117,7 @@ public class Menu {
 
     private void mostrarCategorias(DatabaseConnection dbConnection) {
         while (true) {
-            System.out.println("\nConexión exitosa.");
+            System.out.println("\nConexion exitosa.");
             System.out.println("|===========================================================|");
             System.out.println("|                         MI ORDEN                          |");
             System.out.println("|                       AROMA Y CAFE                        |");
