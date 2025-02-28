@@ -8,17 +8,17 @@ public class Pedidos {
     private Scanner scanner = new Scanner(System.in);
 
     public void MostrarPedidos(DatabaseConnection dbConnection) {
-        System.out.println("\n|===========================================================|");
+        System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.println("|                                                           |");
         System.out.println("|                    HISTORIAL DE PEDIDOS                   |");
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.println("|                                                           |");
         System.out.println("| Ingresa el ID de un pedido para ver su detalle            |");
         System.out.println("|                                                           |");
         dbConnection.listPedidos();
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.print("Selecciona una opcion (0 para salir): ");
         int opcion = scanner.nextInt();
         List<Integer> idsValidos = dbConnection.getValidOrderIds();
@@ -36,17 +36,17 @@ public class Pedidos {
     }
 
     public void detallePedido(DatabaseConnection dbConnection, int opcion) {
-        System.out.println("\n|===========================================================|");
+        System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.println("|                                                           |");
         System.out.println("|                     DETALLES DE PEDIDO                    |");
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.println("|                                                           |");
         System.out.println("| Productos Seleccionados                                   |");
         System.out.println("|                                                           |");
         dbConnection.listDetallesPedido(opcion);
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.print("Ingresa (E) para eliminar este pedido o (V) para volver: ");
         String opi = scanner.next();
 

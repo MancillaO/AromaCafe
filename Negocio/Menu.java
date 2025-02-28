@@ -109,7 +109,7 @@ public class Menu {
             }
 
             // Solicitar que el usuario elija un rol
-            
+
             System.out.print("Seleccione un rol: ");
             String rolSeleccionado = scanner.nextLine();
 
@@ -121,7 +121,6 @@ public class Menu {
     }
 
     private void conectarMongoDB() {
-        
 
         System.out.print("Ingrese la IP del servidor MongoDB: ");
         String ip = scanner.nextLine();
@@ -148,10 +147,18 @@ public class Menu {
     public void iniciar() {
         int opcion = 0;
         while (opcion != 3) {
-            System.out.println("\n|===========================================================|");
+            System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+            System.out.println("|                                                           |");
             System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
             System.out.println("|                  \"UN CAFE, MIL MOMENTOS\"                  |");
-            System.out.println("|===========================================================|");
+            System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+            System.out.println("|                                                           |");
+            System.out.println("|                          ( (                              |");
+            System.out.println("|                           ) )                             |");
+            System.out.println("|                          ______                           |");
+            System.out.println("|                         |      |]                         |");
+            System.out.println("|                         |      |                          |");
+            System.out.println("|                         \\______/                          |");
             System.out.println("|                                                           |");
             System.out.println("| Seleccione la base de datos a la que desea conectarse:    |");
             System.out.println("|                                                           |");
@@ -160,7 +167,7 @@ public class Menu {
             System.out.println("| 3. MongoDB                                                |");
             System.out.println("| 4. Salir                                                  |");
             System.out.println("|                                                           |");
-            System.out.println("|===========================================================|");
+            System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
             System.out.print("Selecciona una opcion: ");
             opcion = scanner.nextInt();
 
@@ -184,10 +191,19 @@ public class Menu {
     }
 
     public void menuInicio(DatabaseConnection dbConnection) {
-        System.out.println("\n|===========================================================|");
+        System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+        System.out.println("|                                                           |");
         System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
         System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
-        System.out.println("|===========================================================|");
+        System.out.println("|                                                           |");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+        System.out.println("|                                                           |");
+        System.out.println("|                          ( (                              |");
+        System.out.println("|                           ) )                             |");
+        System.out.println("|                          ______                           |");
+        System.out.println("|                         |      |]                         |");
+        System.out.println("|                         |      |                          |");
+        System.out.println("|                         \\______/                          |");
         System.out.println("|                                                           |");
         System.out.println("| Esperamos que te sientas genial.                          |");
         System.out.println("| ¿Que deseas hacer?                                        |");
@@ -196,7 +212,7 @@ public class Menu {
         System.out.println("| 2. Historial de Pedidos                                   |");
         System.out.println("| 3. Salir                                                  |");
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.print("Selecciona una opcion: ");
         int opcion = scanner.nextInt();
 
