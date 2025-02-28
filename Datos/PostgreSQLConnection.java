@@ -11,13 +11,31 @@ import java.util.List;
 
 public class PostgreSQLConnection implements DatabaseConnection {
 
-    private static final String POSTGRESQL_URL = EnvLoader.get("POSTGRESQL_URL");
-    private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
-    private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
+    private String ip;
+    private String dbName;
+    private String user;
+    private String password;
+
+
+    public PostgreSQLConnection(String ip, String dbName, String user, String password) {
+        this.ip = ip;
+        this.dbName = dbName;
+        this.user = user;
+        this.password = password;
+    }
 
     public Connection getConnection() throws SQLException {
+
+        if (ip == null || dbName == null || user == null || password == null) {
+
+            throw new SQLException("Los parámetros de conexión son inválidos.");
+
+        }
         try {
-            return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
+            String url = "jdbc:postgresql://" + ip + ":5432/" + dbName;
+            
+            return DriverManager.getConnection(url, user, password);
+
         } catch (SQLException e) {
             throw new SQLException("No se pudo conectar a la base de datos", e);
         }

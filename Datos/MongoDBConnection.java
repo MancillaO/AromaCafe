@@ -17,20 +17,29 @@ import java.util.List;
 public class MongoDBConnection implements DatabaseConnection {
 
     private final MongoDatabase database;
+    private String ip;
+    private String dbName;
+    private String user;
+    private String password;
+    
 
-    public MongoDBConnection() {
-        
+   public MongoDBConnection(String ip, String dbName, String user, String password) {
+        this.ip = ip;
+        this.dbName = dbName;
+        this.user = user;
+        this.password = password;
+
         try {
             System.out.println("Iniciando conexión a MongoDB...");
-            String uri = EnvLoader.get("MONGODB_URI");
+            
+            String uri = "mongodb://" + user + ":" + password + "@" + ip + ":27017/" + dbName;
             System.out.println("URI de conexión: " + uri);
 
             MongoClient mongoClient = MongoClients.create(uri);
-            this.database = mongoClient.getDatabase("aroma_y_cafe");
+            this.database = mongoClient.getDatabase(dbName);
 
-            System.out.println("Conexión establecida con la base de datos: aroma_y_cafe");
+            System.out.println("Conexión establecida con la base de datos: " + dbName);
 
-            // Verificar si las colecciones existen
             System.out.println("Colecciones disponibles:");
             database.listCollectionNames().forEach(collectionName -> {
                 System.out.println(" - " + collectionName);
@@ -39,6 +48,33 @@ public class MongoDBConnection implements DatabaseConnection {
             System.err.println("Error al inicializar la conexión MongoDB: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error de conexión a MongoDB", e);
+        }
+    }
+
+    public MongoDatabase getDatabase() {
+        return this.database;
+    }
+
+    public void getUsers() {
+        try {
+            MongoCollection<Document> usersCollection = database.getCollection("users");
+            
+            if (usersCollection == null) {
+                System.out.println("La colección 'users' no existe en la base de datos.");
+                return;
+            }
+
+            System.out.println("===================================================");
+
+            for (Document doc : usersCollection.find()) {
+                System.out.println(doc.toJson());
+            }
+            
+            System.out.println("===================================================");
+
+        } catch (MongoException e) {
+            System.err.println("Error al acceder a la colección 'users': " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

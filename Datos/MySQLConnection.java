@@ -11,13 +11,27 @@ import java.util.List;
 
 public class MySQLConnection implements DatabaseConnection {
 
-    private static final String MYSQL_URL = EnvLoader.get("MYSQL_URL");
-    private static final String MYSQL_USER = EnvLoader.get("MYSQL_USER");
-    private static final String MYSQL_PASSWORD = EnvLoader.get("MYSQL_PASSWORD");
+    private String ip;
+    private String dbName;
+    private String user;
+    private String password;
+
+    public MySQLConnection(String ip, String dbName, String user, String password) {
+        this.ip = ip;
+        this.dbName = dbName;
+        this.user = user;
+        this.password = password;
+    }
+
 
     public Connection getConnection() throws SQLException {
+         if (ip == null || dbName == null || user == null || password == null) {
+
+            throw new SQLException("Los parámetros de conexión son inválidos.");
+
         try {
-            return DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
+           String url = "jdbc:mysql://" + ip + ":3306/" + dbName;
+        return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             throw new SQLException("No se pudo cargar el driver JDBC", e);
         }

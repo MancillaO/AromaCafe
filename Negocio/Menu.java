@@ -14,9 +14,27 @@ public class Menu {
     private ArrayList<Integer> productosSeleccionados = new ArrayList<>();
 
     private void ConectarPostgres() {
-        PostgreSQLConnection postgres = new PostgreSQLConnection();
+        Scanner sc = new Scanner(System.in);
+
+        // Solicitar los datos al usuario
+        System.out.print("Ingrese la IP del servidor PostgreSQL: ");
+        String ip = sc.nextLine();
+
+        System.out.print("Ingrese el nombre de la base de datos: ");
+        String dbName = sc.nextLine();
+
+        System.out.print("Ingrese el usuario: ");
+        String user = sc.nextLine();
+
+        System.out.print("Ingrese la contraseña: ");
+        String password = sc.nextLine();
+
+        // Crear la conexión con los datos proporcionados
+        PostgreSQLConnection postgres = new PostgreSQLConnection(ip, dbName, user, password);
         try (Connection conn = postgres.getConnection()) {
             if (conn != null) {
+                // Mostrar los roles disponibles
+                mostrarRolesPostgreSQL(conn);
                 menuInicio(postgres);
             }
         } catch (Exception e) {
@@ -24,19 +42,100 @@ public class Menu {
         }
     }
 
+    private void mostrarRolesPostgreSQL(Connection conn) {
+        try {
+            Statement stmt = conn.createStatement();
+            String query = "SELECT rolname FROM pg_roles WHERE rolcanlogin = true;";
+            ResultSet rs = stmt.executeQuery(query);
+
+            System.out.println("Roles disponibles:");
+            while (rs.next()) {
+                System.out.println(rs.getString("rolname"));
+            }
+
+            // Solicitar que el usuario elija un rol
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Seleccione un rol: ");
+            String rolSeleccionado = sc.nextLine();
+
+            System.out.println("Rol seleccionado: " + rolSeleccionado);
+
+        } catch (SQLException e) {
+            System.out.println("Error al obtener roles: " + e.getMessage());
+        }
+    }
+
     private void conectarMySQL() {
-        MySQLConnection mysql = new MySQLConnection();
+        Scanner sc = new Scanner(System.in);
+
+        // Solicitar los datos al usuario
+        System.out.print("Ingrese la IP del servidor MySQL: ");
+        String ip = sc.nextLine();
+
+        System.out.print("Ingrese el nombre de la base de datos: ");
+        String dbName = sc.nextLine();
+
+        System.out.print("Ingrese el usuario: ");
+        String user = sc.nextLine();
+
+        System.out.print("Ingrese la contraseña: ");
+        String password = sc.nextLine();
+
+        // Crear la conexión con los datos proporcionados
+        MySQLConnection mysql = new MySQLConnection(ip, dbName, user, password);
         try (Connection conn = mysql.getConnection()) {
             if (conn != null) {
+                // Mostrar los roles disponibles
+                mostrarRolesMySQL(conn);
                 menuInicio(mysql);
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a MySQL: " + e.getMessage());
         }
+}
+
+private void mostrarRolesMySQL(Connection conn) {
+    try {
+        Statement stmt = conn.createStatement();
+        String query = "SELECT User, Host FROM mysql.user WHERE Host != 'localhost';";
+        ResultSet rs = stmt.executeQuery(query);
+
+        System.out.println("Roles disponibles:");
+        while (rs.next()) {
+            System.out.println(rs.getString("User"));
+        }
+        
+
+        // Solicitar que el usuario elija un rol
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Seleccione un rol: ");
+        String rolSeleccionado = sc.nextLine();
+
+        System.out.println("Rol seleccionado: " + rolSeleccionado);
+
+    } catch (SQLException e) {
+        System.out.println("Error al obtener roles: " + e.getMessage());
     }
+}
+
     private void conectarMongoDB() {
-        MongoDBConnection mongo = new MongoDBConnection();
+          Scanner sc = new Scanner(System.in);
+
+        System.out.print("Ingrese la IP del servidor MongoDB: ");
+        String ip = sc.nextLine();
+
+        System.out.print("Ingrese el nombre de la base de datos: ");
+        String dbName = sc.nextLine();
+
+        System.out.print("Ingrese el usuario: ");
+        String user = sc.nextLine();
+
+        System.out.print("Ingrese la contraseña: ");
+        String password = sc.nextLine();
+
+        MongoDBConnection mongo = new MongoDBConnection(ip, dbName, user, password);
         try {
+            mongo.getUsers(); // Método para listar usuarios
             menuInicio(mongo);
         } catch (Exception e) {
             System.out.println("Error al conectar a MongoDB: " + e.getMessage());
