@@ -15,4 +15,8 @@ public interface DatabaseConnection {
     void insertDetallePedido(int pedidoId, int productoId);
     boolean isProductInCategory(int productId, int categoryId);
     List<Integer> getValidCategoryIds();
+    List<Integer> getValidOrderIds();
+    void listPedidos();
+    void listDetallesPedido(int pedidoId);
+    void deletePedido(int id);
 }
