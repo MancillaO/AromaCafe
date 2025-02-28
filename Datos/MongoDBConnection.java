@@ -24,10 +24,11 @@ public class MongoDBConnection implements DatabaseConnection {
         try {
             System.out.println("Iniciando conexión a MongoDB...");
             String uri = EnvLoader.get("MONGODB_URI");
+            String db = EnvLoader.get("MONGODB_DB");
             System.out.println("URI de conexión: " + uri);
 
             MongoClient mongoClient = MongoClients.create(uri);
-            this.database = mongoClient.getDatabase("aroma_y_cafe");
+            this.database = mongoClient.getDatabase(db);
 
             System.out.println("Conexión establecida con la base de datos: aroma_y_cafe");
 
