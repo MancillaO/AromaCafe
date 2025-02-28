@@ -127,6 +127,11 @@ CREATE USER 'alansegundotest'@'10.11.4.219' IDENTIFIED BY '123';
 GRANT ALL PRIVILEGES ON *.* TO 'alansegundotest'@'10.11.4.219' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 
+-- Roles con Limitaciones
+CREATE USER 'cafemy'@'%' IDENTIFIED BY '123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON aroma_y_cafe.* TO 'aroma_user'@'%';
+FLUSH PRIVILEGES;
+
 7. Reiniciar servidor MySQL:
 net stop mysql
 net start mysql
