@@ -272,7 +272,7 @@ public class MongoDBConnection implements DatabaseConnection {
             ObjectId id = result.getInsertedId().asObjectId().getValue();
 
             int pedidoId = id.hashCode(); // Conversión a int para mantener compatibilidad
-            System.out.println("\nPedido insertado correctamente en MongoDB. ID del pedido: " + pedidoId);
+            // System.out.println("\nPedido insertado correctamente en MongoDB. ID del pedido: " + pedidoId);
 
             return pedidoId;
         } catch (Exception e) {
@@ -291,7 +291,7 @@ public class MongoDBConnection implements DatabaseConnection {
                 int id = objId.hashCode();
                 java.util.Date fecha = pedido.getDate("fecha");
 
-                System.out.println("| " + id + ". " + "Pedido del dia: " + fecha + "                             |");
+                System.out.println("| ID: " + id + ". " + "Pedido del dia: " + fecha + "                         |");
             }
         } catch (Exception e) {
             System.err.println("Error al listar pedidos: " + e.getMessage());
