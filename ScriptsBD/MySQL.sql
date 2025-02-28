@@ -88,3 +88,10 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+
+
+-- Creando Roles/Usuarios
+CREATE USER 'cafemy'@'%' IDENTIFIED BY '123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON aroma_y_cafe.* TO 'aroma_user'@'%';
+FLUSH PRIVILEGES;

@@ -48,8 +48,8 @@ db.detalles_pedido.createIndex({ producto_id: 1 })
 
 // Crear usuario con permisos
 db.createUser({
-    user: "aroma_user",
-    pwd: "cafe123",
+    user: "cafemon",
+    pwd: "123",
     roles: [
         { role: "readWrite", db: "aroma_y_cafe" }
     ]

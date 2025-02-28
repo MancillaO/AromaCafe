@@ -1,0 +1,142 @@
+COMANDOS ÚTILES:
+1. ipconfig --> Muestra la dirección de mi máquina en la línea Dirección IPv4.
+2. netstat -an | findstr 3306 --> Verifica que el puerto MySQL esté escuchando.
+3. netstat -an | findstr 5432 --> Verifica que el puerto PostgreSQL esté escuchando.
+4. net stop postgresql-x64-15 --> Detiene el servicio de PostgreSQL para reiniciarlo
+5. net start postgresql-x64-15 --> Inicia el servicio de PostgreSQL
+6. net stop MySQL --> Detiene el servicio de MySQL para reiniciarlo
+7. net start MySQL --> Inicia el servicio de MySQL
+8. Si da error de autenticación, revisa pg_hba.conf y ejecuta: 
+SELECT * FROM pg_hba_file_rules;
+
+
+-----------------------------------------------------------------------------------------
+CONFIGURAR EL FIREWALL DE FORMA MANUAL:
+
+1. Abre el Firewall de Windows:
+2. Presiona Win + R, escribe firewall.cpl y presiona Enter.
+3. Crea una nueva regla de entrada:
+4. Ve a Configuración avanzada → Reglas de entrada.
+5. Haz clic en Nueva regla.
+6. Selecciona Puerto y haz clic en Siguiente.
+7. Elige TCP y especifica el puerto 3306 para MySQL o 5432 para PostgreSQL, luego Siguiente.
+8. Marca Permitir la conexión y haz clic en Siguiente.
+9. Asegúrate de que la regla se aplique en Dominios, Privado y Público.
+10. Ponle un nombre (ej. "MySQL Remoto") y guarda la regla.
+
+OTRO EJEMPLO:
+PostgreSQL usa el puerto 5432, así que debemos abrirlo en el firewall:
+
+1. Abre el Firewall de Windows (Win + R → firewall.cpl → Enter).
+2. Ve a Configuración Avanzada → Reglas de Entrada → Nueva Regla.
+3. Selecciona "Puerto" → TCP → Escribe "5432" → Siguiente.
+4. Marca "Permitir la Conexión" → Siguiente → Aplica en todos los perfiles.
+5. Ponle un nombre (ej. "PostgreSQL Remoto") y guarda la regla.
+
+------------------------------------------------------------------------------------------
+COMANDOS EN POWERSHELL PARA AGREGAR REGLAS AL FIREWALL MYSQL Y POSTGRESQL:
+
+netsh advfirewall firewall add rule name="PostgreSQL" dir=in action=allow protocol=TCP localport=5432
+
+netsh advfirewall firewall add rule name="MySQL" dir=in action=allow protocol=TCP localport=3306
+
+===========================================================================================
+### CONEXIÓN REMOTA A POSTGRESQL: ###
+
+
+1. Modificar el Código en las cadenas de conexión (ConexionBD.java) para que usen mi dirección IP en lugar de localhost:
+
+Ejemplo: Modificando ConexionBD.java
+-- Se va el localhost y coloco la dirección IP de mi maquina.
+
+private static final String POSTGRES_URL = "jdbc:postgresql://10.11.4.100:5432/alan";
+private static final String MYSQL_URL = "jdbc:mysql://10.11.4.100:3306/alan";
+
+-------------------------------------------------------------------------------------------
+
+2. Abrir el archivo de "postgresql.conf" encontrado en: C:\Program Files\PostgreSQL\15\data\postgresql.conf
+
+-------------------------------------------------------------------------------------------
+
+3. Buscar la línea "listen_addresses = 'localhost'" y cambiarla por:
+
+listen_addresses = '*' --> o colocar dirección IP del profesor.
+listen_addresses = 'IP_PROFESOR'
+
+- Guardar archivo y cerrar.
+
+-------------------------------------------------------------------------------------------
+
+4. Editar el archivo pg_hba.conf en la misma ruta C:\Program Files\PostgreSQL\15\data\pg_hba.conf y agregar la siguiente línea:
+
+- IP: Debe ser la del profesor
+host    all    all    10.11.4.219/32    md5 --> Solo el profesor se puede conectar.
+
+host    all    all    0.0.0.0/0    md5 --> Cualquier IP se puede conectar.
+
+
+- Guardar archivo y cerrar.
+
+-------------------------------------------------------------------------------------------
+
+CREAR USUARIOS EN POSTGRESQL:
+
+-- TIENE ACCESO TOTAL PARA UN USUARIO ADMINISTRADOR YA INCLUYE PROCEDMIENTOS ALMACENADOS
+
+CREATE USER alanpostgre WITH PASSWORD '123';
+ALTER USER alanpostgre WITH SUPERUSER;
+GRANT ALL PRIVILEGES ON DATABASE alandb TO alanpostgre;
+
+-- CREA UN USUARIO NORMAL CON PERMISOS LIMITADOS A ACCIONES SOLO EN LAS TABLAS DEL ESQUEMA PUBLIC NECSITO METER LOS 3 COMANDOS PARA INCLUIR LOS PROCEDMIENTOS ALMACENADOS
+
+CREATE ROLE alansegundotest WITH LOGIN PASSWORD '123';
+
+1. GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO alansegundotest;
+2. GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO alansegundotest;
+
+-- INCLUYE PROCEDIMIENTOS ALMACENADOS
+
+3. GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO alansegundotest;
+================================================================================================
+Usuarios con Limitaciones PostgreSQL
+CREATE USER cafepost WITH PASSWORD '123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO cafepost;
+
+===========================================================================================
+### CONEXIÓN REMOTA A MYSQL: ###
+
+1. Abrir XAMPP y asegurarme que MySQL este detenido.
+2. Ir a la carpeta donde esta instalado XAMPP C:\xampp\mysql\bin
+3. Buscar y abrir el archivo "my.ini" con un editor de texto 
+4. Buscar la línea bind-address = 127.0.0.1 y cambiarla por: 
+   bind-address = 0.0.0.0 --> Cualquiera se conecta
+   bind-address = 10.11.4.219  --> Solo el profesor se conecta
+5. Entrar a: mysql -u root -p
+
+-------------------------------------------------------------------------------------------6. CREAR USUARIO REMOTO 
+
+El comando GRANT ALL... YA INCLUYE PROCEDIMIENTOS ALMACENADOS
+
+--Todo mundo se puede conectar:
+CREATE USER 'alansegundotest'@'%' IDENTIFIED BY '123';
+GRANT ALL PRIVILEGES ON *.* TO 'alansegundotest'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES; 
+
+--Solo el profesor se puede conectar:
+CREATE USER 'alansegundotest'@'10.11.4.219' IDENTIFIED BY '123';
+GRANT ALL PRIVILEGES ON *.* TO 'alansegundotest'@'10.11.4.219' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
+
+-- Roles con Limitaciones
+CREATE USER 'cafemy'@'%' IDENTIFIED BY '123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON aroma_y_cafe.* TO 'aroma_user'@'%';
+FLUSH PRIVILEGES;
+
+7. Reiniciar servidor MySQL:
+net stop mysql
+net start mysql
+
+
+
+
+
