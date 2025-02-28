@@ -5,6 +5,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -19,7 +20,7 @@ public class MongoDBConnection implements DatabaseConnection {
     private final MongoDatabase database;
 
     public MongoDBConnection() {
-        
+
         try {
             System.out.println("Iniciando conexión a MongoDB...");
             String uri = EnvLoader.get("MONGODB_URI");
@@ -42,19 +43,17 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
     public Connection getConnection() throws SQLException {
         // MongoDB no usa JDBC, retornamos null pero mantenemos la interfaz
         return null;
     }
 
-    @Override
     public void listCategorias() {
         try {
             MongoCollection<Document> categorias = database.getCollection("categorias");
             long count = categorias.countDocuments();
 
-            final int LINE_WIDTH = 62;
+            final int LINE_WIDTH = 59;
             final int MARGIN = 1;
 
             for (Document cat : categorias.find()) {
@@ -63,8 +62,8 @@ public class MongoDBConnection implements DatabaseConnection {
                         .append(" ".repeat(MARGIN))
                         .append(cat.getInteger("id")).append(". ")
                         .append(cat.getString("nombre"));
-                int remainingSpace = LINE_WIDTH - line.length() - MARGIN - 1;
-                line.append(" ".repeat(remainingSpace))
+                int remainingSpace = LINE_WIDTH - line.length() + 1;
+                line.append(" ".repeat(Math.max(0, remainingSpace)))
                         .append("|");
                 System.out.println(line);
             }
@@ -74,7 +73,6 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
     public List<Integer> getValidCategoryIds() {
         try {
             MongoCollection<Document> categorias = database.getCollection("categorias");
@@ -90,24 +88,42 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
+    public List<Integer> getValidOrderIds() {
+        try {
+            MongoCollection<Document> pedidos = database.getCollection("pedidos");
+            List<Integer> ids = new ArrayList<>();
+            for (Document doc : pedidos.find()) {
+                // Usamos el valor hash del ObjectId como nuestro id numérico
+                ObjectId objId = doc.getObjectId("_id");
+                ids.add(objId.hashCode());
+            }
+            return ids;
+        } catch (Exception e) {
+            System.err.println("Error al obtener IDs de pedidos: " + e.getMessage());
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
+    }
+
     public void listProductos(int categoriaId) {
         try {
-            System.out.println("Listando productos para categoría ID: " + categoriaId);
             MongoCollection<Document> productos = database.getCollection("productos");
-            long count = productos.countDocuments(Filters.eq("categoria_id", categoriaId));
-            System.out.println("Número de productos encontrados: " + count);
 
             final int LINE_WIDTH = 59;
             final int MARGIN = 1;
 
             System.out.println("\n|===========================================================|");
-            System.out.println("|                  Productos disponibles                    |");
+            System.out.println("|                   Productos disponibles                   |");
             System.out.println("|===========================================================|");
+            System.out.println("|                                                           |");
 
             for (Document prod : productos.find(Filters.eq("categoria_id", categoriaId))) {
+                StringBuilder line = new StringBuilder();
+                line.append("|");
+                line.append(" ".repeat(MARGIN));
                 String id = prod.getInteger("id").toString();
                 String nombre = prod.getString("nombre");
+
                 // Maneja tanto Integer como Double para el precio
                 String precio;
                 if (prod.get("precio") instanceof Integer) {
@@ -115,13 +131,18 @@ public class MongoDBConnection implements DatabaseConnection {
                 } else {
                     precio = String.format("$%.2f", prod.getDouble("precio"));
                 }
-                String productText = id + ". " + nombre + " ";
-                int dashesLength = LINE_WIDTH - productText.length() - precio.length() - MARGIN - 2;
 
-                System.out.println(
-                        "|" + " ".repeat(MARGIN) + productText +
-                                "-".repeat(Math.max(0, dashesLength)) + " " + precio + " |");
+                String productText = id + ". " + nombre + " ";
+                line.append(productText);
+                int dashesLength = LINE_WIDTH - productText.length() - precio.length() - MARGIN - 2;
+                line.append("-".repeat(Math.max(0, dashesLength)));
+                line.append(" " + precio);
+                line.append(" |");
+
+                System.out.println(line.toString());
             }
+
+            System.out.println("|                                                           |");
             System.out.println("|===========================================================|\n");
         } catch (Exception e) {
             System.err.println("Error al listar productos: " + e.getMessage());
@@ -129,18 +150,14 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
     public boolean isProductInCategory(int productId, int categoryId) {
         try {
-            // System.out.println("Verificando si el producto " + productId + " está en la
-            // categoría " + categoryId);
             MongoCollection<Document> productos = database.getCollection("productos");
             boolean exists = productos.find(
                     Filters.and(
                             Filters.eq("id", productId),
                             Filters.eq("categoria_id", categoryId)))
                     .first() != null;
-            // System.out.println("Resultado: " + exists);
             return exists;
         } catch (Exception e) {
             System.err.println("Error al verificar producto en categoría: " + e.getMessage());
@@ -149,10 +166,8 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
     public void mostrarProductoPorId(int id) {
         try {
-            // System.out.println("Buscando producto con ID: " + id);
             MongoCollection<Document> productos = database.getCollection("productos");
             Document prod = productos.find(Filters.eq("id", id)).first();
 
@@ -217,13 +232,18 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
     public double calcularTotalOrden(int[] ids) {
+        if (ids == null || ids.length == 0) {
+            System.out.println("No se proporcionaron IDs para calcular el total.");
+            return 0.0;
+        }
+
         try {
             MongoCollection<Document> productos = database.getCollection("productos");
             List<Integer> idList = new ArrayList<>();
-            for (int id : ids)
+            for (int id : ids) {
                 idList.add(id);
+            }
 
             double total = 0;
             for (Document prod : productos.find(Filters.in("id", idList))) {
@@ -242,16 +262,19 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
     public int insertPedido(double total) {
         try {
             MongoCollection<Document> pedidos = database.getCollection("pedidos");
-            InsertOneResult result = pedidos.insertOne(
-                    new Document("total", total)
-                            .append("fecha", new java.util.Date()));
+            Document pedido = new Document("total", total)
+                    .append("fecha", new java.util.Date());
 
+            InsertOneResult result = pedidos.insertOne(pedido);
             ObjectId id = result.getInsertedId().asObjectId().getValue();
-            return id.hashCode(); // Conversión a int
+
+            int pedidoId = id.hashCode(); // Conversión a int para mantener compatibilidad
+            System.out.println("\nPedido insertado correctamente en MongoDB. ID del pedido: " + pedidoId);
+
+            return pedidoId;
         } catch (Exception e) {
             System.err.println("Error al insertar pedido: " + e.getMessage());
             e.printStackTrace();
@@ -259,7 +282,59 @@ public class MongoDBConnection implements DatabaseConnection {
         }
     }
 
-    @Override
+    public void listPedidos() {
+        try {
+            MongoCollection<Document> pedidos = database.getCollection("pedidos");
+
+            for (Document pedido : pedidos.find()) {
+                ObjectId objId = pedido.getObjectId("_id");
+                int id = objId.hashCode();
+                java.util.Date fecha = pedido.getDate("fecha");
+
+                System.out.println("| " + id + ". " + "Pedido del dia: " + fecha + "                             |");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al listar pedidos: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void deletePedido(int id) {
+        try {
+            // Como usamos hashCode() del ObjectId para el id, no podemos buscar
+            // directamente.
+            // Necesitamos buscar todos los pedidos y comparar su hashCode.
+            MongoCollection<Document> pedidos = database.getCollection("pedidos");
+            Document pedidoToDelete = null;
+
+            for (Document pedido : pedidos.find()) {
+                ObjectId objId = pedido.getObjectId("_id");
+                if (objId.hashCode() == id) {
+                    pedidoToDelete = pedido;
+                    break;
+                }
+            }
+
+            if (pedidoToDelete != null) {
+                DeleteResult result = pedidos.deleteOne(Filters.eq("_id", pedidoToDelete.getObjectId("_id")));
+                if (result.getDeletedCount() > 0) {
+                    System.out.println("\nPedido eliminado correctamente en MongoDB.");
+
+                    // También eliminar detalles asociados
+                    MongoCollection<Document> detalles = database.getCollection("detalles_pedido");
+                    detalles.deleteMany(Filters.eq("pedido_id", id));
+                } else {
+                    System.out.println("No se pudo eliminar el pedido con ID " + id + " en MongoDB.");
+                }
+            } else {
+                System.out.println("No se encontró ningún pedido con ID " + id + " en MongoDB.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al eliminar pedido: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     public void insertDetallePedido(int pedidoId, int productoId) {
         try {
             MongoCollection<Document> detalles = database.getCollection("detalles_pedido");
@@ -268,6 +343,21 @@ public class MongoDBConnection implements DatabaseConnection {
                             .append("producto_id", productoId));
         } catch (Exception e) {
             System.err.println("Error al insertar detalle de pedido: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void listDetallesPedido(int pedidoId) {
+        try {
+            MongoCollection<Document> detalles = database.getCollection("detalles_pedido");
+
+            for (Document detalle : detalles.find(Filters.eq("pedido_id", pedidoId))) {
+                ArrayList<Integer> productosSeleccionados = new ArrayList<>();
+                productosSeleccionados.add(detalle.getInteger("producto_id"));
+                resumenOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al listar detalles de pedido: " + e.getMessage());
             e.printStackTrace();
         }
     }
