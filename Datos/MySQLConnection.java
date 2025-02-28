@@ -19,7 +19,7 @@ public class MySQLConnection implements DatabaseConnection {
         try {
             return DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD);
         } catch (SQLException e) {
-            throw new SQLException("No se pudo cargar el driver JDBC", e);
+            throw new SQLException("No se pudo conectar a la base de datos", e);
         }
     }
 
@@ -63,21 +63,19 @@ public class MySQLConnection implements DatabaseConnection {
         return validIds;
     }
 
-    public void updateCategoria(int id, String nuevoNombre) {
-        String query = "UPDATE categorias SET nombre = ? WHERE id = ?";
+    public List<Integer> getValidOrderIds() {
+        List<Integer> validIds = new ArrayList<>();
+        String query = "SELECT id FROM pedidos";
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nuevoNombre);
-            stmt.setInt(2, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Categoría actualizada correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ninguna categoría con ID " + id + " en MySQL.");
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                validIds.add(rs.getInt("id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return validIds;
     }
 
     public void listProductos(int categoriaId) {
@@ -201,7 +199,7 @@ public class MySQLConnection implements DatabaseConnection {
                 + String.join(",", Collections.nCopies(ids.length, "?")) + ")";
         double total = 0.0;
 
-        try (Connection conn = getConnection(); // Obtener la conexión
+        try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
 
             // Asignar los IDs al PreparedStatement
@@ -255,8 +253,8 @@ public class MySQLConnection implements DatabaseConnection {
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Fecha: " + rs.getTimestamp("fecha") +
-                        ", Total: " + rs.getDouble("total"));
+                System.out.println("| " + rs.getInt("id") + ". " + "Pedido del dia: " + rs.getDate("fecha")
+                        + "                             |");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -270,24 +268,7 @@ public class MySQLConnection implements DatabaseConnection {
             stmt.setInt(1, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Pedido eliminado correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ningún pedido con ID " + id + " en MySQL.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updatePedido(int id, double nuevoTotal) {
-        String query = "UPDATE pedidos SET total = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(1, nuevoTotal);
-            stmt.setInt(2, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Pedido actualizado correctamente en MySQL.");
+                System.out.println("\nPedido eliminado correctamente en MySQL.");
             } else {
                 System.out.println("No se encontró ningún pedido con ID " + id + " en MySQL.");
             }
@@ -304,58 +285,23 @@ public class MySQLConnection implements DatabaseConnection {
             stmt.setInt(1, pedidoId);
             stmt.setInt(2, productoId);
             stmt.executeUpdate();
-            // System.out.println("Detalle de pedido insertado correctamente en MySQL.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void listDetallesPedido() {
-        String query = "SELECT * FROM detalles_pedido";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Pedido ID: " + rs.getInt("pedido_id") +
-                        ", Producto ID: " + rs.getInt("producto_id") + ", Cantidad: " + rs.getInt("cantidad") +
-                        ", Precio Unitario: " + rs.getDouble("precio_unitario"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteDetallePedido(int id) {
-        String query = "DELETE FROM detalles_pedido WHERE id = ?";
+    public void listDetallesPedido(int pedidoId) {
+        String query = "SELECT * FROM detalles_pedido WHERE pedido_id = ?";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Detalle de pedido eliminado correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en MySQL.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+            stmt.setInt(1, pedidoId);
 
-    public void updateDetallePedido(int id, int nuevoPedidoId, int nuevoProductoId, int nuevaCantidad,
-            double nuevoPrecioUnitario) {
-        String query = "UPDATE detalles_pedido SET pedido_id = ?, producto_id = ?, cantidad = ?, precio_unitario = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, nuevoPedidoId);
-            stmt.setInt(2, nuevoProductoId);
-            stmt.setInt(3, nuevaCantidad);
-            stmt.setDouble(4, nuevoPrecioUnitario);
-            stmt.setInt(5, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Detalle de pedido actualizado correctamente en MySQL.");
-            } else {
-                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en MySQL.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ArrayList<Integer> productosSeleccionados = new ArrayList<>();
+                    productosSeleccionados.add(rs.getInt("producto_id"));
+                    resumenOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();

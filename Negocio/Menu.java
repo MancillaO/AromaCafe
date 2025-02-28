@@ -12,12 +12,14 @@ import java.util.Scanner;
 public class Menu {
     private Scanner scanner = new Scanner(System.in);
     private ArrayList<Integer> productosSeleccionados = new ArrayList<>();
+    Pedidos pedidos = new Pedidos();
 
     private void ConectarPostgres() {
         PostgreSQLConnection postgres = new PostgreSQLConnection();
         try (Connection conn = postgres.getConnection()) {
             if (conn != null) {
                 menuInicio(postgres);
+                productosSeleccionados.clear();
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a PostgreSQL: " + e.getMessage());
@@ -29,15 +31,18 @@ public class Menu {
         try (Connection conn = mysql.getConnection()) {
             if (conn != null) {
                 menuInicio(mysql);
+                productosSeleccionados.clear();
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a MySQL: " + e.getMessage());
         }
     }
+
     private void conectarMongoDB() {
         MongoDBConnection mongo = new MongoDBConnection();
         try {
             menuInicio(mongo);
+            productosSeleccionados.clear();
         } catch (Exception e) {
             System.out.println("Error al conectar a MongoDB: " + e.getMessage());
         }
@@ -81,7 +86,7 @@ public class Menu {
         }
     }
 
-    private void menuInicio(DatabaseConnection dbConnection) {
+    public void menuInicio(DatabaseConnection dbConnection) {
         System.out.println("\n|===========================================================|");
         System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
         System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
@@ -103,12 +108,14 @@ public class Menu {
                 mostrarCategorias(dbConnection);
                 break;
             case 2:
-                System.out.println("\nFuncion en desarrollo...");
+                pedidos.MostrarPedidos(dbConnection);
                 break;
             case 3:
                 System.out.println("Saliendo...");
                 break;
             default:
+                System.out.println("\nOpcion invalida");
+                menuInicio(dbConnection);
                 break;
         }
     }
@@ -157,7 +164,7 @@ public class Menu {
             System.out.print("Selecciona: ");
             String opcionAdd = scanner.next();
             if (opcionAdd.equalsIgnoreCase("si")) {
-                productosSeleccionados.add(opcionProd); 
+                productosSeleccionados.add(opcionProd);
                 // System.out.println(productosSeleccionados);
                 while (true) {
                     System.out.println("\n¿Desea algo mas? SI/NO");
