@@ -88,3 +88,9 @@ CREATE TRIGGER trigger_actualizar_precio_unitario
 BEFORE INSERT ON detalles_pedido
 FOR EACH ROW
 EXECUTE FUNCTION actualizar_precio_unitario();
+
+
+
+-- Creando Roles/Usuarios
+CREATE USER cafepost WITH PASSWORD '123';
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO cafepost;

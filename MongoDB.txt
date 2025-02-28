@@ -1,0 +1,27 @@
+Crear en ruta C:\mongosh
+
+para ejecutar en cmd:
+mongosh y enter
+
+Cambiar archivo similar a PostgreSQL y MySQL
+1. C:\Program Files\MongoDB\Server\4.2\bin
+2. mongod.cfg
+3. Modificar línea bindIp a 0.0.0.0
+# network interfaces
+net:
+  port: 27017
+  bindIp: 0.0.0.0
+
+4. Conectarse de forma remota:
+mongosh "mongodb://<UsuarioCreado>:pwd@ip:puerto/<nameBD>"
+mongosh "mongodb://alan:123@10.11.4.10:27017/alan"
+
+----------------------------------------
+crear BD --> use <nombre>
+Ver bases de datos --> show dbs
+Crear coleccion --> db.createCollection("andy")
+Insertar datos -->  db.andy.insertMany([{id: 1, nom: "Alan Cid"}, {id: 2, nom: "Ximena Vargas"}, {id: 3, nom: "Yami Diaz"}])
+Ver colecciones --> show collections
+Mostrar registros --> db.andy.find()
+Crear usuario --> db.createUser({user: "alan", pwd: "123",
+roles: [{role: "readWrite", db: "alan"}]})
