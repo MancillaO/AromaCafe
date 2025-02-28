@@ -2,6 +2,7 @@ package Negocio;
 
 import Datos.PostgreSQLConnection;
 import Datos.DatabaseConnection;
+import Datos.MongoDBConnection;
 import Datos.MySQLConnection;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -11,12 +12,14 @@ import java.util.Scanner;
 public class Menu {
     private Scanner scanner = new Scanner(System.in);
     private ArrayList<Integer> productosSeleccionados = new ArrayList<>();
+    Pedidos pedidos = new Pedidos();
 
     private void ConectarPostgres() {
         PostgreSQLConnection postgres = new PostgreSQLConnection();
         try (Connection conn = postgres.getConnection()) {
             if (conn != null) {
                 menuInicio(postgres);
+                productosSeleccionados.clear();
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a PostgreSQL: " + e.getMessage());
@@ -28,9 +31,20 @@ public class Menu {
         try (Connection conn = mysql.getConnection()) {
             if (conn != null) {
                 menuInicio(mysql);
+                productosSeleccionados.clear();
             }
         } catch (Exception e) {
             System.out.println("Error al conectar a MySQL: " + e.getMessage());
+        }
+    }
+
+    private void conectarMongoDB() {
+        MongoDBConnection mongo = new MongoDBConnection();
+        try {
+            menuInicio(mongo);
+            productosSeleccionados.clear();
+        } catch (Exception e) {
+            System.out.println("Error al conectar a MongoDB: " + e.getMessage());
         }
     }
 
@@ -46,7 +60,8 @@ public class Menu {
             System.out.println("|                                                           |");
             System.out.println("| 1. PostgreSQL                                             |");
             System.out.println("| 2. MySQL                                                  |");
-            System.out.println("| 3. Salir                                                  |");
+            System.out.println("| 3. MongoDB                                                |");
+            System.out.println("| 4. Salir                                                  |");
             System.out.println("|                                                           |");
             System.out.println("|===========================================================|");
             System.out.print("Selecciona una opcion: ");
@@ -60,6 +75,9 @@ public class Menu {
                     conectarMySQL();
                     break;
                 case 3:
+                    conectarMongoDB();
+                    break;
+                case 4:
                     System.out.println("Saliendo...");
                     break;
                 default:
@@ -68,17 +86,17 @@ public class Menu {
         }
     }
 
-    private void menuInicio(DatabaseConnection dbConnection) {
+    public void menuInicio(DatabaseConnection dbConnection) {
         System.out.println("\n|===========================================================|");
         System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
-        System.out.println("|                  \"UN CAFE, MIL MOMENTOS\"                  |");
+        System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
         System.out.println("|===========================================================|");
         System.out.println("|                                                           |");
         System.out.println("| Esperamos que te sientas genial.                          |");
         System.out.println("| ¿Que deseas hacer?                                        |");
         System.out.println("|                                                           |");
         System.out.println("| 1. Menu                                                   |");
-        System.out.println("| 2. Consultar Orden                                        |");
+        System.out.println("| 2. Historial de Pedidos                                   |");
         System.out.println("| 3. Salir                                                  |");
         System.out.println("|                                                           |");
         System.out.println("|===========================================================|");
@@ -90,21 +108,22 @@ public class Menu {
                 mostrarCategorias(dbConnection);
                 break;
             case 2:
-                System.out.println("\nFuncion en desarrollo...");
+                pedidos.MostrarPedidos(dbConnection);
                 break;
             case 3:
                 System.out.println("Saliendo...");
                 break;
             default:
+                System.out.println("\nOpcion invalida");
+                menuInicio(dbConnection);
                 break;
         }
     }
 
     private void mostrarCategorias(DatabaseConnection dbConnection) {
         while (true) {
-            System.out.println("\nConexión exitosa.");
             System.out.println("|===========================================================|");
-            System.out.println("|                         MI ORDEN                          |");
+            System.out.println("|                           MENU                            |");
             System.out.println("|                       AROMA Y CAFE                        |");
             System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
             System.out.println("|===========================================================|");
@@ -116,10 +135,17 @@ public class Menu {
             System.out.println("|===========================================================|");
 
             List<Integer> validCategoryIds = dbConnection.getValidCategoryIds();
-            System.out.print("Selecciona una opcion: ");
-            int opcionCat = scanner.nextInt();
+            System.out.print("Selecciona una opcion o ingresar 0 para regresar: ");
 
-            if (validCategoryIds.contains(opcionCat)) {
+            while (!scanner.hasNextInt()) {
+                System.out.print("Opción inválida. Intente de nuevo: ");
+                scanner.next();
+            }
+            int opcionCat = scanner.nextInt();
+            if (opcionCat == 0) {
+                menuInicio(dbConnection);
+                return;
+            } else if (validCategoryIds.contains(opcionCat)) {
                 mostrarProductos(dbConnection, opcionCat);
                 break;
             } else {
@@ -131,12 +157,23 @@ public class Menu {
     private void mostrarProductos(DatabaseConnection dbConnection, int opcionCat) {
         while (true) {
             dbConnection.listProductos(opcionCat);
-            System.out.print("Selecciona una opcion: ");
+            System.out.print("Selecciona una opcion o ingresar 0 para regresar: ");
+            while (!scanner.hasNextInt()) {
+                System.out.print("Opción inválida. Intente de nuevo: ");
+                scanner.next();
+            }
             int opcionProd = scanner.nextInt();
-
-            if (!dbConnection.isProductInCategory(opcionProd, opcionCat)) {
+            if (opcionProd == 0) {
+                mostrarCategorias(dbConnection);
+                return;
+            } else if (!dbConnection.isProductInCategory(opcionProd, opcionCat)) {
                 System.out.println("\nOpcion no valida");
                 continue;
+            }
+            if (opcionProd == 0) {
+                mostrarCategorias(dbConnection);
+                return;
+
             }
             System.out.println("\n=============================================================");
 
@@ -145,7 +182,7 @@ public class Menu {
             System.out.print("Selecciona: ");
             String opcionAdd = scanner.next();
             if (opcionAdd.equalsIgnoreCase("si")) {
-                productosSeleccionados.add(opcionProd); 
+                productosSeleccionados.add(opcionProd);
                 // System.out.println(productosSeleccionados);
                 while (true) {
                     System.out.println("\n¿Desea algo mas? SI/NO");
@@ -185,12 +222,17 @@ public class Menu {
         if (opcion.equalsIgnoreCase("a")) {
             mostrarCategorias(dbConnection);
         } else if (opcion.equalsIgnoreCase("c")) {
+
             double total = dbConnection.calcularTotalOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
             int idPedido = dbConnection.insertPedido(total);
             for (int idProducto : productosSeleccionados) {
                 dbConnection.insertDetallePedido(idPedido, idProducto);
             }
+            System.out.println("\n¡Pedido #" + idPedido + " confirmado con éxito!");
+            System.out.println("¡Gracias por su compra!");
+            productosSeleccionados.clear();
             menuInicio(dbConnection);
+
         } else {
             System.out.println("Opcion invalida. Intente de nuevo.");
             resumenOrden(dbConnection);

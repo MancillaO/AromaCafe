@@ -15,7 +15,6 @@ public class PostgreSQLConnection implements DatabaseConnection {
     private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
     private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
 
-    @Override
     public Connection getConnection() throws SQLException {
         try {
             return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
@@ -65,21 +64,19 @@ public class PostgreSQLConnection implements DatabaseConnection {
         return validIds;
     }
 
-    public void updateCategoria(int id, String nuevoNombre) {
-        String query = "UPDATE categorias SET nombre = ? WHERE id = ?";
+    public List<Integer> getValidOrderIds() {
+        List<Integer> validIds = new ArrayList<>();
+        String query = "SELECT id FROM pedidos";
         try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, nuevoNombre);
-            stmt.setInt(2, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Categoría actualizada correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ninguna categoría con ID " + id + " en PostgreSQL.");
+                PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                validIds.add(rs.getInt("id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return validIds;
     }
 
     public void listProductos(int categoriaId) {
@@ -235,7 +232,8 @@ public class PostgreSQLConnection implements DatabaseConnection {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     pedidoId = rs.getInt("id"); // Obtener el ID generado
-                    System.out.println("\nPedido insertado correctamente en PostgreSQL. ID del pedido: " + pedidoId);
+                    // System.out.println("\nPedido insertado correctamente en PostgreSQL. ID del
+                    // pedido: " + pedidoId);
                 }
             }
         } catch (SQLException e) {
@@ -250,8 +248,8 @@ public class PostgreSQLConnection implements DatabaseConnection {
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Fecha: " + rs.getTimestamp("fecha") +
-                        ", Total: " + rs.getDouble("total"));
+                System.out.println("| ID: " + rs.getInt("id") + ". " + "Pedido del dia: " + rs.getDate("fecha")
+                        + "                         |");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -265,24 +263,7 @@ public class PostgreSQLConnection implements DatabaseConnection {
             stmt.setInt(1, id);
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Pedido eliminado correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ningún pedido con ID " + id + " en PostgreSQL.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void updatePedido(int id, double nuevoTotal) {
-        String query = "UPDATE pedidos SET total = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setDouble(1, nuevoTotal);
-            stmt.setInt(2, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Pedido actualizado correctamente en PostgreSQL.");
+                System.out.println("\nPedido eliminado correctamente en PostgreSQL.");
             } else {
                 System.out.println("No se encontró ningún pedido con ID " + id + " en PostgreSQL.");
             }
@@ -299,59 +280,23 @@ public class PostgreSQLConnection implements DatabaseConnection {
             stmt.setInt(1, pedidoId);
             stmt.setInt(2, productoId);
             stmt.executeUpdate();
-            // System.out.println("Detalle de pedido insertado correctamente en
-            // PostgreSQL.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void listDetallesPedido() {
-        String query = "SELECT * FROM detalles_pedido";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) {
-                System.out.println("ID: " + rs.getInt("id") + ", Pedido ID: " + rs.getInt("pedido_id") +
-                        ", Producto ID: " + rs.getInt("producto_id") + ", Cantidad: " + rs.getInt("cantidad") +
-                        ", Precio Unitario: " + rs.getDouble("precio_unitario"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteDetallePedido(int id) {
-        String query = "DELETE FROM detalles_pedido WHERE id = ?";
+    public void listDetallesPedido(int pedidoId) {
+        String query = "SELECT * FROM detalles_pedido WHERE pedido_id = ?";
         try (Connection conn = getConnection();
                 PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Detalle de pedido eliminado correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en PostgreSQL.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+            stmt.setInt(1, pedidoId);
 
-    public void updateDetallePedido(int id, int nuevoPedidoId, int nuevoProductoId, int nuevaCantidad,
-            double nuevoPrecioUnitario) {
-        String query = "UPDATE detalles_pedido SET pedido_id = ?, producto_id = ?, cantidad = ?, precio_unitario = ? WHERE id = ?";
-        try (Connection conn = getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setInt(1, nuevoPedidoId);
-            stmt.setInt(2, nuevoProductoId);
-            stmt.setInt(3, nuevaCantidad);
-            stmt.setDouble(4, nuevoPrecioUnitario);
-            stmt.setInt(5, id);
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                System.out.println("Detalle de pedido actualizado correctamente en PostgreSQL.");
-            } else {
-                System.out.println("No se encontró ningún detalle de pedido con ID " + id + " en PostgreSQL.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ArrayList<Integer> productosSeleccionados = new ArrayList<>();
+                    productosSeleccionados.add(rs.getInt("producto_id"));
+                    resumenOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
