@@ -23,18 +23,15 @@ public class MySQLConnection implements DatabaseConnection {
         this.password = password;
     }
 
-
     public Connection getConnection() throws SQLException {
-         if (ip == null || dbName == null || user == null || password == null) {
-
+        if (ip == null || dbName == null || user == null || password == null)
             throw new SQLException("Los parámetros de conexión son inválidos.");
-
         try {
-           String url = "jdbc:mysql://" + ip + ":3306/" + dbName;
-        return DriverManager.getConnection(url, user, password);
+            String url = "jdbc:mysql://" + ip + ":3306/" + dbName;
+            return DriverManager.getConnection(url, user, password);
         } catch (SQLException e) {
             throw new SQLException("No se pudo conectar a la base de datos", e);
-        }
+        } 
     }
 
     public void listCategorias() {
@@ -252,7 +249,8 @@ public class MySQLConnection implements DatabaseConnection {
             try (ResultSet rs = lastIdStmt.executeQuery()) {
                 if (rs.next()) {
                     pedidoId = rs.getInt(1);
-                    // System.out.println("\nPedido insertado correctamente en MySQL. ID del pedido: " + pedidoId);
+                    // System.out.println("\nPedido insertado correctamente en MySQL. ID del pedido:
+                    // " + pedidoId);
                 }
             }
         } catch (SQLException e) {
