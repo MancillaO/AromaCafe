@@ -1,9 +1,7 @@
 package Negocio;
 
-// import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
 import Datos.DatabaseConnection;
 
 public class Pedidos {
@@ -17,17 +15,18 @@ public class Pedidos {
         System.out.println("|===========================================================|");
         System.out.println("|                                                           |");
         System.out.println("| Ingresa el ID de un pedido para ver su detalle            |");
-        System.out.println("| Ingresa 0 para salir                                      |");
         System.out.println("|                                                           |");
         dbConnection.listPedidos();
         System.out.println("|                                                           |");
         System.out.println("|===========================================================|");
-        System.out.print("Selecciona una opcion: ");
+        System.out.print("Selecciona una opcion (0 para salir): ");
         int opcion = scanner.nextInt();
         List<Integer> idsValidos = dbConnection.getValidOrderIds();
 
         if (opcion == 0) {
-            System.out.println("\nSaliendo...");
+            Menu menu = new Menu();
+            menu.menuInicio(dbConnection);
+            return;
         } else if (idsValidos.contains(opcion)) {
             detallePedido(dbConnection, opcion);
         } else {
@@ -47,16 +46,21 @@ public class Pedidos {
         System.out.println("|                                                           |");
         dbConnection.listDetallesPedido(opcion);
         System.out.println("|                                                           |");
-        System.out.println("| Si desea eliminar este pedido ingrese \"E\"                 |");
-        System.out.println("| Si desea volver al historial ingrese \"V\"                  |");
-        System.out.println("|                                                           |");
         System.out.println("|===========================================================|");
-        System.out.print("Selecciona una opcion: ");
+        System.out.print("Ingresa (E) para eliminar este pedido o (V) para volver: ");
         String opi = scanner.next();
 
         if (opi.equalsIgnoreCase("E")) {
-            dbConnection.deletePedido(opcion);
-            MostrarPedidos(dbConnection);
+            System.out.print("\n¿Estás seguro de eliminar el pedido #" + opcion + "? (S/N): ");
+            String confirmacion = scanner.next();
+
+            if (confirmacion.equalsIgnoreCase("S")) {
+                dbConnection.deletePedido(opcion);
+                System.out.println("\n¡Pedido #" + opcion + " eliminado correctamente!");
+                MostrarPedidos(dbConnection);
+            } else {
+                detallePedido(dbConnection, opcion);
+            }
         } else if (opi.equalsIgnoreCase("V")) {
             MostrarPedidos(dbConnection);
         } else {

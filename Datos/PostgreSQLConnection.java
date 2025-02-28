@@ -232,7 +232,8 @@ public class PostgreSQLConnection implements DatabaseConnection {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     pedidoId = rs.getInt("id"); // Obtener el ID generado
-                    System.out.println("\nPedido insertado correctamente en PostgreSQL. ID del pedido: " + pedidoId);
+                    // System.out.println("\nPedido insertado correctamente en PostgreSQL. ID del
+                    // pedido: " + pedidoId);
                 }
             }
         } catch (SQLException e) {
@@ -247,8 +248,8 @@ public class PostgreSQLConnection implements DatabaseConnection {
                 PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                System.out.println("| " + rs.getInt("id") + ". " + "Pedido del dia: " + rs.getDate("fecha")
-                        + "                             |");
+                System.out.println("| ID: " + rs.getInt("id") + ". " + "Pedido del dia: " + rs.getDate("fecha")
+                        + "                         |");
             }
         } catch (SQLException e) {
             e.printStackTrace();
