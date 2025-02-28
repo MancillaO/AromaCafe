@@ -110,7 +110,6 @@ public class MySQLConnection implements DatabaseConnection {
                 line.append(" |");
                 System.out.println(line.toString());
             }
-
             System.out.println("|                                                           |");
             System.out.println("|===========================================================|\n");
         } catch (SQLException e) {

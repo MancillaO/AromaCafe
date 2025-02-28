@@ -15,7 +15,6 @@ public class PostgreSQLConnection implements DatabaseConnection {
     private static final String POSTGRESQL_USER = EnvLoader.get("POSTGRESQL_USER");
     private static final String POSTGRESQL_PASSWORD = EnvLoader.get("POSTGRESQL_PASSWORD");
 
-    @Override
     public Connection getConnection() throws SQLException {
         try {
             return DriverManager.getConnection(POSTGRESQL_URL, POSTGRESQL_USER, POSTGRESQL_PASSWORD);
