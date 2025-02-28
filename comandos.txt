@@ -3,3 +3,6 @@ javac -cp ".;Drivers/postgresql-42.2.29.jre7.jar;Drivers/mysql-connector-j-8.0.3
 
 -- Ejecutar:
 java -cp ".;Drivers/postgresql-42.2.29.jre7.jar;Drivers/mysql-connector-j-8.0.33.jar;Drivers/mongodb-driver-sync-5.1.2.jar;Drivers/mongodb-driver-core-5.1.2.jar;Drivers/bson-5.1.2.jar" Presentacion.Cafeteria
+
+--Borrar todos los .class
+del /s *.class

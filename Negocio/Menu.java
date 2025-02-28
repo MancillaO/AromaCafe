@@ -51,10 +51,18 @@ public class Menu {
     public void iniciar() {
         int opcion = 0;
         while (opcion != 3) {
-            System.out.println("\n|===========================================================|");
+            System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+            System.out.println("|                                                           |");
             System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
             System.out.println("|                  \"UN CAFE, MIL MOMENTOS\"                  |");
-            System.out.println("|===========================================================|");
+            System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+            System.out.println("|                                                           |");
+            System.out.println("|                          ( (                              |");
+            System.out.println("|                           ) )                             |");
+            System.out.println("|                          ______                           |");
+            System.out.println("|                         |      |]                         |");
+            System.out.println("|                         |      |                          |");
+            System.out.println("|                         \\______/                          |");
             System.out.println("|                                                           |");
             System.out.println("| Seleccione la base de datos a la que desea conectarse:    |");
             System.out.println("|                                                           |");
@@ -63,7 +71,7 @@ public class Menu {
             System.out.println("| 3. MongoDB                                                |");
             System.out.println("| 4. Salir                                                  |");
             System.out.println("|                                                           |");
-            System.out.println("|===========================================================|");
+            System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
             System.out.print("Selecciona una opcion: ");
             opcion = scanner.nextInt();
 
@@ -87,10 +95,19 @@ public class Menu {
     }
 
     public void menuInicio(DatabaseConnection dbConnection) {
-        System.out.println("\n|===========================================================|");
+        System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+        System.out.println("|                                                           |");
         System.out.println("|                 BIENVENIDO A AROMA Y CAFE                 |");
         System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
-        System.out.println("|===========================================================|");
+        System.out.println("|                                                           |");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+        System.out.println("|                                                           |");
+        System.out.println("|                          ( (                              |");
+        System.out.println("|                           ) )                             |");
+        System.out.println("|                          ______                           |");
+        System.out.println("|                         |      |]                         |");
+        System.out.println("|                         |      |                          |");
+        System.out.println("|                         \\______/                          |");  
         System.out.println("|                                                           |");
         System.out.println("| Esperamos que te sientas genial.                          |");
         System.out.println("| ¿Que deseas hacer?                                        |");
@@ -99,7 +116,7 @@ public class Menu {
         System.out.println("| 2. Historial de Pedidos                                   |");
         System.out.println("| 3. Salir                                                  |");
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.print("Selecciona una opcion: ");
         int opcion = scanner.nextInt();
 
@@ -122,17 +139,17 @@ public class Menu {
 
     private void mostrarCategorias(DatabaseConnection dbConnection) {
         while (true) {
-            System.out.println("|===========================================================|");
+            System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
             System.out.println("|                           MENU                            |");
             System.out.println("|                       AROMA Y CAFE                        |");
             System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
-            System.out.println("|===========================================================|");
+            System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
             System.out.println("|                                                           |");
             System.out.println("| ¿Alguna preferencia de tu eleccion en este momento?       |");
             System.out.println("|                                                           |");
             dbConnection.listCategorias();
             System.out.println("|                                                           |");
-            System.out.println("|===========================================================|");
+            System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
 
             List<Integer> validCategoryIds = dbConnection.getValidCategoryIds();
             System.out.print("Selecciona una opcion o ingresar 0 para regresar: ");
@@ -175,7 +192,7 @@ public class Menu {
                 return;
 
             }
-            System.out.println("\n=============================================================");
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
             dbConnection.mostrarProductoPorId(opcionProd);
             System.out.println("¿Desea agregar este producto? SI/NO");
@@ -206,17 +223,17 @@ public class Menu {
     }
 
     private void resumenOrden(DatabaseConnection dbConnection) {
-        System.out.println("\n|===========================================================|");
+        System.out.println("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.println("|                         MI ORDEN                          |");
         System.out.println("|                       AROMA Y CAFE                        |");
         System.out.println("|                 \"UN CAFE, MIL MOMENTOS\"                   |");
-        System.out.println("|===========================================================|");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
         System.out.println("|                                                           |");
         System.out.println("| Tu orden hasta ahora es:                                  |");
         System.out.println("|                                                           |");
         dbConnection.resumenOrden(productosSeleccionados.stream().mapToInt(i -> i).toArray());
         System.out.println("|                                                           |");
-        System.out.println("|===========================================================|\n");
+        System.out.println("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|\n");
         System.out.print("¿Desea agregar algo mas o confirmar su orden (A/C)? ");
         String opcion = scanner.next();
         if (opcion.equalsIgnoreCase("a")) {
